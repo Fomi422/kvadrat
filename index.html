@@ -1,0 +1,817 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Квадрат и прямоугольник</title>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Квадраты">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#1d1d1d">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icon-180.png">
+<link rel="icon" href="icon-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@500;700&family=Nunito:wght@400;600;700;800&display=swap">
+<style>:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
+</head>
+<body>
+<style>
+/* Layout: пиксельный мир — небо и земля на фоне, каменные панели-«инвентарь», фигуры в светлых слотах.
+   Красная линия = периметр (забор), зелёные клетки = площадь (газон). Одна дневная тема — выбрана намеренно. */
+:root{
+  --sky:#8fbaff; --panel:#c6c6c6; --hi:#ffffff; --lo:#555555; --edge:#141414; --ink:#1c1c1c; --muted:#3d3d3d;
+  --slot:#f4f3ec; --slot-lo:#8b8b8b;
+  --btn:#7b7b7b; --btn-hi:#b8b8b8; --btn-lo:#474747; --btn-hover:#6f82cc;
+  --go:#3e8e2c; --go-hi:#83cf5c; --go-lo:#245a18;
+  --fill:#b9e08c; --grid:#6f9e3c; --per:#d0261f; --line:#2a2a2a; --water:#86bdf2; --water-d:#2f6fb8; --ame:#8b2fc9; --ame-soft:#ead8f8;
+  --gem:#1fae4f; --dia:#35d0e0; --gold:#f6d046; --xp:#7fe03a; --hud:#1d1d1d; --hud-ink:#f2f2f2;
+  --ok:#1d7a2d; --ok-soft:#d4f2c7; --bad:#b3241e; --bad-soft:#fbdcd8;
+  --f-pix:"Pixelify Sans","Courier New",monospace;
+  --f-body:"Nunito","Segoe UI",system-ui,sans-serif;
+  color-scheme:light;
+}
+*{box-sizing:border-box}
+body{background:var(--sky);color:var(--ink);font-family:var(--f-body);font-size:17px;line-height:1.55}
+#bg{position:fixed;inset:0;width:100%;height:100%;z-index:-1;image-rendering:pixelated;image-rendering:crisp-edges}
+.page{padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:24px 120px}
+.wrap{max-width:900px;margin:0 auto;display:flex;flex-direction:column;gap:40px}
+h1,h2,h3{font-family:var(--f-pix);font-weight:700;margin:0;line-height:1.15;text-wrap:balance}
+h1{font-size:clamp(2.1rem,7vw,3.4rem);color:#fff;text-shadow:4px 4px 0 #2d2d2d}
+h2{font-size:clamp(1.6rem,5vw,2.2rem);color:#fff;text-shadow:3px 3px 0 #2d2d2d}
+h3{font-size:1.35rem}
+p{margin:0}
+.sub{color:#fff;text-shadow:2px 2px 0 #2d2d2d;font-family:var(--f-pix);font-size:1.2rem}
+
+/* HUD */
+.hud{position:sticky;top:env(safe-area-inset-top,0px);z-index:10;background:var(--hud);border-bottom:3px solid #000;color:var(--hud-ink);
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:8px}
+.hud-in{max-width:900px;margin:0 auto;display:flex;flex-wrap:wrap;align-items:center;gap:10px 18px;font-family:var(--f-pix);font-size:1.15rem}
+.res{display:inline-flex;align-items:center;gap:6px;font-variant-numeric:tabular-nums}
+.res b{min-width:1.5ch}
+.xp{display:flex;align-items:center;gap:8px;flex:1 1 140px;min-width:120px}
+.lvl{color:var(--xp);text-shadow:2px 2px 0 #000;min-width:4.5ch}
+.bar{flex:1;height:12px;background:#000;border:2px solid #000;box-shadow:inset 0 0 0 2px #3a3a3a}
+.bar i{display:block;height:100%;width:0;background:var(--xp);transition:width .5s}
+.bump{animation:bump .45s}
+@keyframes bump{30%{transform:scale(1.5)}}
+
+/* nav */
+nav{display:flex;flex-wrap:wrap;gap:8px}
+nav a{font-family:var(--f-pix);font-size:1rem;color:#fff;text-decoration:none;background:var(--btn);border:2px solid var(--edge);
+  box-shadow:inset 2px 2px 0 var(--btn-hi),inset -2px -3px 0 var(--btn-lo);padding:5px 11px;text-shadow:2px 2px 0 #3a3a3a}
+nav a:hover,nav a:focus-visible{background:var(--btn-hover)}
+
+/* panels */
+section{display:flex;flex-direction:column;gap:16px;scroll-margin-top:80px}
+.panel{background:var(--panel);border:3px solid var(--edge);box-shadow:inset 3px 3px 0 var(--hi),inset -3px -3px 0 var(--lo);
+  padding:18px 20px;display:flex;flex-direction:column;gap:12px;min-width:0}
+.slot{background:var(--slot);border:2px solid #373737;box-shadow:inset 3px 3px 0 var(--slot-lo),inset -3px -3px 0 #fff;padding:10px}
+.row{display:flex;flex-wrap:wrap;gap:16px;align-items:stretch}
+.row>*{flex:1 1 260px;min-width:0}
+.figbox{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;overflow-x:auto;margin:0}
+.cap{font-size:.92rem;color:var(--muted);text-align:center}
+.per{color:var(--per);font-weight:800}.area{color:var(--grid);font-weight:800}
+.frame{background:#fff8d6;border:3px solid var(--edge);box-shadow:inset 3px 3px 0 #fffdf0,inset -3px -3px 0 #c9b05a;padding:14px 18px;display:flex;flex-direction:column;gap:6px}
+.frame .tag{font-family:var(--f-pix);font-size:1.2rem;color:#7a5a00}
+.formula{font-weight:800;font-size:1.2rem;font-variant-numeric:tabular-nums}
+.hint{font-size:.95rem;color:var(--muted)}
+.vs{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px}
+.vs>div{padding:14px;display:flex;flex-direction:column;gap:6px;border:2px solid var(--edge);min-width:0}
+.vs .p{background:var(--bad-soft)}.vs .s{background:var(--ok-soft)}
+.vs b{font-family:var(--f-pix);font-size:1.3rem}
+.pair{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;align-items:flex-end}
+.pair svg{flex:1 1 140px}
+
+/* svg */
+svg.fig{width:100%;height:auto;display:block}
+.g-fill{fill:var(--fill)}
+.g-water{fill:var(--water)}
+.g-hatch{fill:var(--ame-soft)}
+.g-grid{stroke:var(--grid);stroke-width:1}
+.g-faint{stroke:#cfcfc4;stroke-width:1}
+.g-tile{stroke:#3f6a18;stroke-width:3}
+.g-edge{stroke:var(--line);stroke-width:3;fill:none;stroke-linejoin:miter}
+.g-per{stroke:var(--per);stroke-width:5;fill:none;stroke-linejoin:miter}
+.g-dash{stroke:var(--ame);stroke-width:2.5;stroke-dasharray:7 5;fill:none}
+.g-dashp{stroke:var(--ame);stroke-width:2.5;stroke-dasharray:7 5;fill:none}
+.g-angle{stroke:var(--water-d);stroke-width:2;fill:none}
+.g-tick{stroke:var(--per);stroke-width:2.5}
+.g-cell{fill:none;stroke:var(--grid);stroke-width:1}
+.g-thick{stroke:var(--line);stroke-width:3.5;stroke-linecap:square}
+svg text{font-family:var(--f-body);font-weight:800;fill:var(--ink);font-size:15px;paint-order:stroke;stroke:var(--slot);stroke-width:4px;stroke-linejoin:round}
+svg text.q{fill:var(--ame)}
+svg text.c{font-size:16px;stroke-width:5px}
+svg text.n{font-size:10px;font-weight:600;fill:#4f6e2c;stroke:none}
+svg text.nm{font-size:13px;fill:var(--muted)}
+
+/* buttons */
+.btn{font-family:var(--f-pix);font-weight:500;font-size:1.05rem;color:#fff;text-shadow:2px 2px 0 #3a3a3a;background:var(--btn);border:2px solid var(--edge);
+  box-shadow:inset 2px 2px 0 var(--btn-hi),inset -2px -3px 0 var(--btn-lo);padding:9px 14px;cursor:pointer;display:inline-flex;align-items:center;gap:6px;text-decoration:none;line-height:1.1}
+.btn:hover:not(:disabled){background:var(--btn-hover)}
+.btn.go{background:var(--go);box-shadow:inset 2px 2px 0 var(--go-hi),inset -2px -3px 0 var(--go-lo)}
+.btn.go:hover:not(:disabled){background:#4aa636}
+.btn:disabled{background:#8e8e8e;color:#d0d0d0;text-shadow:none;cursor:not-allowed;box-shadow:inset 2px 2px 0 #a5a5a5,inset -2px -3px 0 #6c6c6c}
+.btn.small{font-size:.95rem;padding:6px 10px}
+.btn .price{display:inline-flex;align-items:center;gap:2px;background:rgba(0,0,0,.35);padding:2px 6px;margin-left:2px}
+button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+.btns{display:flex;flex-wrap:wrap;gap:10px}
+.chip.on{background:var(--btn-hover)}
+
+/* tasks / examples */
+.grp{color:#fff;text-shadow:3px 3px 0 #2d2d2d;font-size:1.6rem}
+.ex-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,330px),1fr));gap:16px}
+.kind{font-family:var(--f-pix);font-size:1.15rem;line-height:1.2}
+.ex-head{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}
+.gems{display:inline-flex;gap:2px;flex:none}
+.cond{font-weight:700;font-size:1.05rem}
+.steps{margin:0;padding-left:1.4em;display:flex;flex-direction:column;gap:5px;font-variant-numeric:tabular-nums}
+.steps li::marker{font-weight:800;color:var(--muted)}
+.ans{align-self:flex-start;background:var(--ok-soft);color:var(--ok);font-weight:800;padding:3px 10px;border:2px solid var(--ok)}
+.ex-foot{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:8px;margin-top:auto}
+.done-n{font-size:.9rem;font-weight:700;color:var(--muted)}
+.done-n.yes{color:var(--ok)}
+
+/* lab */
+.ctrl{display:grid;gap:12px;align-content:start}
+.ctrl label{display:flex;justify-content:space-between;font-weight:700}
+input[type=range]{width:100%;accent-color:var(--go)}
+.checks{display:flex;flex-wrap:wrap;gap:10px 18px}
+.checks label{display:flex;gap:6px;align-items:center;font-weight:600}
+
+/* trainer */
+.tr-top{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.tr-top label{font-weight:800}
+select{font:inherit;font-weight:700;padding:8px;border:2px solid var(--edge);background:var(--slot);color:var(--ink);max-width:100%;min-width:0;flex:1 1 220px}
+.tr-body{display:grid;grid-template-columns:1fr;gap:16px}
+@media (min-width:780px){.tr-body{grid-template-columns:1.1fr 1fr}}
+.tr-left{display:flex;flex-direction:column;gap:12px;min-width:0}
+.badges{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.badge{font-family:var(--f-pix);font-size:.95rem;background:#e2e2e2;border:2px solid var(--edge);padding:2px 8px;display:inline-flex;gap:4px;align-items:center}
+.tr-q{font-size:1.15rem;font-weight:700}
+.tr-in{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.tr-in input{font:inherit;font-weight:800;font-size:1.3rem;width:130px;padding:8px 10px;border:2px solid var(--edge);background:var(--slot);color:var(--ink);box-shadow:inset 2px 2px 0 var(--slot-lo)}
+.unit{font-weight:800;font-size:1.15rem}
+.fb{font-weight:800;min-height:1.5em}
+.fb.ok{color:var(--ok)}.fb.no{color:var(--bad)}
+.help{display:flex;flex-direction:column;gap:8px}
+.help>div{background:#fff8d6;border:2px solid #b89a3a;padding:10px 12px}
+.help b.t{font-family:var(--f-pix);font-weight:500;display:block;color:#7a5a00}
+.rules{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
+.rules ul{margin:0;padding-left:1.1em;display:flex;flex-direction:column;gap:4px}
+.rules li{line-height:1.4}
+.ico{display:inline-flex;vertical-align:-3px}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}
+.stat{background:#e2e2e2;border:2px solid var(--edge);padding:10px;display:flex;flex-direction:column;gap:2px}
+.stat b{font-family:var(--f-pix);font-size:1.6rem;font-variant-numeric:tabular-nums}
+.stat span{font-size:.88rem;color:var(--muted);font-weight:700}
+
+/* chest */
+.items{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px}
+.item{background:#8b8b8b;border:3px solid var(--edge);box-shadow:inset 3px 3px 0 #b0b0b0,inset -3px -3px 0 #5a5a5a;padding:12px;display:flex;flex-direction:column;align-items:center;gap:8px;color:#fff;text-align:center}
+.item .pic{width:64px;height:64px;display:grid;place-items:center;background:#6c6c6c;box-shadow:inset 3px 3px 0 #3f3f3f,inset -3px -3px 0 #a0a0a0}
+.item.locked .pic svg{filter:brightness(0) opacity(.45)}
+.item .nm{font-family:var(--f-pix);font-size:1.05rem;text-shadow:2px 2px 0 #3a3a3a}
+.item .pr{display:flex;gap:8px;align-items:center;font-weight:800;font-variant-numeric:tabular-nums}
+.item.own{background:#5f8f3e;box-shadow:inset 3px 3px 0 #8cc066,inset -3px -3px 0 #3c6326}
+.confirm{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+
+/* misc */
+.mist{display:grid;gap:10px}
+.mist>div{display:grid;grid-template-columns:auto 1fr;gap:10px;align-items:start}
+.x{width:28px;height:28px;background:var(--bad);color:#fff;display:grid;place-items:center;font-weight:800;border:2px solid var(--edge)}
+.tw{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-variant-numeric:tabular-nums;background:var(--slot)}
+th,td{border:2px solid #555;padding:8px 10px;text-align:left;vertical-align:top}
+th{font-family:var(--f-pix);font-weight:500;font-size:1.1rem;background:#e2e2e2}
+.toasts{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(16px + env(safe-area-inset-bottom,0px));z-index:20;display:flex;flex-direction:column;gap:8px;align-items:center;pointer-events:none;width:min(92vw,420px)}
+.toast{background:#212121;color:#fff;border:3px solid #000;box-shadow:inset 2px 2px 0 #4a4a4a,inset -2px -2px 0 #111;padding:10px 14px;font-family:var(--f-pix);font-size:1.1rem;display:flex;gap:10px;align-items:center;animation:pop 2.8s forwards}
+.toast .y{color:#ffe34d}
+@keyframes pop{0%{transform:translateY(20px);opacity:0}8%{transform:none;opacity:1}85%{opacity:1}100%{opacity:0}}
+@media (prefers-reduced-motion: reduce){*{animation:none!important;transition:none!important}}
+</style>
+
+<canvas id="bg" aria-hidden="true"></canvas>
+
+<div class="hud" id="hud">
+  <div class="hud-in">
+    <span class="res" title="Изумруды"><span class="ico" data-ico="em24"></span><b id="h-em">0</b></span>
+    <span class="res" title="Алмазы"><span class="ico" data-ico="di24"></span><b id="h-di">0</b></span>
+    <div class="xp" title="Опыт: каждые 50 очков — новый уровень"><span class="lvl" id="h-lvl">Ур. 1</span><div class="bar"><i id="h-bar"></i></div></div>
+    <span class="res" title="Правильных ответов подряд">Серия <b id="h-streak">0</b></span>
+    <a class="btn small" href="#trener">Тренажёр</a>
+  </div>
+</div>
+
+<div class="page"><div class="wrap">
+<header style="display:flex;flex-direction:column;gap:14px">
+  <h1>Квадрат и прямоугольник</h1>
+  <p class="sub">Стороны, периметр, площадь и фигуры из прямоугольников</p>
+  <nav aria-label="Разделы">
+    <a href="#figury">Фигуры</a><a href="#perimetr">Периметр</a><a href="#ploshad">Площадь</a><a href="#raznica">P или S?</a><a href="#edinicy">Единицы</a><a href="#slozhnye">Сложные фигуры</a><a href="#lab">Лаборатория</a><a href="#zadachi">Все задачи</a><a href="#trener">Тренажёр</a><a href="#sunduk">Сундук</a><a href="#oshibki">Ошибки</a><a href="#shpora">Шпаргалка</a>
+  </nav>
+</header>
+
+<section id="figury">
+  <h2>1. Прямоугольник и квадрат</h2>
+  <div class="row">
+    <figure class="panel figbox"><div class="slot" id="f-rect"></div><figcaption class="cap">Прямоугольник: длина <b>a</b> и ширина <b>b</b></figcaption></figure>
+    <figure class="panel figbox"><div class="slot" id="f-sq"></div><figcaption class="cap">Квадрат: все стороны одинаковые</figcaption></figure>
+  </div>
+  <div class="panel">
+    <p><b>Прямоугольник</b> — фигура с четырьмя сторонами, у которой <b>все углы прямые</b>. Прямой угол — как уголок тетрадного листа (на рисунке отмечен синим уголком).</p>
+    <p>У прямоугольника <b>противоположные стороны равны</b>: верхняя равна нижней, левая равна правой. Поэтому нужно знать всего две стороны: <b>длину</b> (<b>a</b>) и <b>ширину</b> (<b>b</b>). Равные стороны помечены одинаковыми чёрточками.</p>
+    <p><b>Квадрат</b> — это прямоугольник, у которого <b>все четыре стороны равны</b>. Поэтому у квадрата достаточно знать одну сторону.</p>
+  </div>
+  <div class="frame"><span class="tag">Запомни</span><p>Каждый квадрат — прямоугольник. Но не каждый прямоугольник — квадрат.</p></div>
+</section>
+
+<section id="perimetr">
+  <h2>2. Периметр — длина забора</h2>
+  <div class="row">
+    <figure class="panel figbox"><div class="slot" id="f-per"></div><figcaption class="cap">Обходим по краю: 6 + 4 + 6 + 4</figcaption></figure>
+    <div class="panel">
+      <p><span class="per">Периметр</span> — это сумма длин <b>всех сторон</b>. Представь, что ставишь забор вокруг огорода. Длина забора и есть периметр.</p>
+      <p>Обозначают буквой <span class="per">P</span>. Измеряют в единицах длины: <b>см, дм, м</b>.</p>
+      <p>Прямоугольник 6 см на 4 см:<br><span class="formula">6 + 4 + 6 + 4 = 20 см</span></p>
+      <p>Длина и ширина встречаются по два раза, поэтому быстрее так:<br><span class="formula">(6 + 4) · 2 = 20 см</span></p>
+    </div>
+  </div>
+  <div class="frame"><span class="tag">Формулы периметра</span>
+    <p class="formula"><span class="per">P</span> прямоугольника = (a + b) · 2</p>
+    <p class="formula"><span class="per">P</span> квадрата = a · 4</p></div>
+</section>
+
+<section id="ploshad">
+  <h2>3. Площадь — сколько клеточек внутри</h2>
+  <div class="row">
+    <figure class="panel figbox"><div class="slot" id="f-area"></div><figcaption class="cap">4 ряда по 6 клеточек = 24 клеточки</figcaption></figure>
+    <div class="panel">
+      <p><span class="area">Площадь</span> показывает, сколько места занимает фигура. Её меряют <b>квадратиками</b>: сколько квадратиков 1 см на 1 см помещается внутри.</p>
+      <p>Обозначают буквой <span class="area">S</span>. Единицы: <b>см², дм², м²</b> («квадратный сантиметр»).</p>
+      <p>Считать каждую клетку долго. Тут <b>4 ряда по 6 клеток</b>, значит:<br><span class="formula">6 · 4 = 24 см²</span></p>
+    </div>
+  </div>
+  <div class="frame"><span class="tag">Формулы площади</span>
+    <p class="formula"><span class="area">S</span> прямоугольника = a · b</p>
+    <p class="formula"><span class="area">S</span> квадрата = a · a</p>
+    <p class="hint">Площадь — это <b>умножение</b> длины на ширину, а не сложение.</p></div>
+</section>
+
+<section id="raznica">
+  <h2>4. Как не перепутать P и S</h2>
+  <div class="row">
+    <figure class="panel figbox"><div class="slot" id="f-vs"></div><figcaption class="cap">Красная линия — периметр, зелёное поле — площадь</figcaption></figure>
+    <div class="vs">
+      <div class="p"><b>Периметр P</b><span>Забор, рамка, бордюр, лента вокруг, обойти по краю.</span><span>Складываем стороны.</span><span>Ответ в <b>см, дм, м</b>.</span></div>
+      <div class="s"><b>Площадь S</b><span>Газон, пол, плитка, покрасить, застелить.</span><span>Умножаем длину на ширину.</span><span>Ответ в <b>см², дм², м²</b>.</span></div>
+    </div>
+  </div>
+</section>
+
+<section id="edinicy">
+  <h2>5. Единицы измерения</h2>
+  <div class="row">
+    <figure class="panel figbox"><div class="slot" id="f-dm"></div><figcaption class="cap">1 дм² — квадрат 10 см на 10 см. Внутри 100 квадратиков по 1 см²</figcaption></figure>
+    <div class="panel">
+      <h3>Длина (для периметра)</h3>
+      <p class="formula">1 дм = 10 см<br>1 м = 10 дм = 100 см</p>
+      <h3>Площадь</h3>
+      <p class="formula">1 дм² = 100 см²<br>1 м² = 100 дм²</p>
+      <p class="hint">Почему 100, а не 10? В квадрате 10 рядов по 10 клеточек: <b>10 · 10 = 100</b>.</p>
+      <p class="hint"><b>Важно:</b> перед решением все стороны переводим в одинаковые единицы.</p>
+    </div>
+  </div>
+</section>
+
+<section id="slozhnye">
+  <h2>6. Сложные фигуры: разрежь или дострой</h2>
+  <div class="row">
+    <figure class="panel figbox"><div class="slot" id="f-split"></div><figcaption class="cap">Способ 1: разрезаем на два прямоугольника</figcaption></figure>
+    <figure class="panel figbox"><div class="slot" id="f-add"></div><figcaption class="cap">Способ 2: достраиваем до большого и вычитаем лишнее</figcaption></figure>
+  </div>
+  <div class="panel">
+    <p><b>Разрезать:</b> делим фигуру на прямоугольники, находим площадь каждого и складываем. 3 · 3 = 9, 6 · 2 = 12, вместе <b>21 см²</b>.</p>
+    <p><b>Достроить:</b> дорисовываем фигуру до большого прямоугольника, находим его площадь и вычитаем добавленный кусок. 6 · 5 = 30, 30 − 9 = <b>21 см²</b>.</p>
+    <p><b>Периметр</b> сложной фигуры — обходим по краю и складываем <b>все</b> стороны. Пунктир внутри в периметр не входит.</p>
+  </div>
+</section>
+
+<section id="lab">
+  <h2>7. Лаборатория: построй сам</h2>
+  <div class="panel">
+    <p class="hint">Двигай ползунки и смотри, как меняются периметр и площадь.</p>
+    <div class="row">
+      <div class="ctrl">
+        <div><label for="la">Длина a <span id="lav">6 см</span></label><input type="range" id="la" min="1" max="12" value="6"></div>
+        <div><label for="lb">Ширина b <span id="lbv">4 см</span></label><input type="range" id="lb" min="1" max="12" value="4"></div>
+        <div class="checks"><label><input type="checkbox" id="lsq"> Квадрат</label><label><input type="checkbox" id="lnum"> Пронумеровать клеточки</label></div>
+        <div class="btns"><button class="btn go" id="lwalk" type="button">Обойти по периметру</button></div>
+        <div class="formula per" id="lp"></div>
+        <div class="formula area" id="ls"></div>
+      </div>
+      <div class="slot figbox" id="lfig"></div>
+    </div>
+  </div>
+</section>
+
+<section id="zadachi">
+  <h2>8. Все виды задач с решениями</h2>
+  <div class="panel"><p>Здесь по одному примеру каждого вида. Под каждым примером есть кнопка: нажми её, и тренажёр будет давать задачи этого вида. Значками <span class="ico" data-ico="em16"></span> отмечена сложность и награда.</p></div>
+  <div id="examples" style="display:flex;flex-direction:column;gap:20px"></div>
+</section>
+
+<section id="trener">
+  <h2>9. Тренажёр</h2>
+  <div class="panel">
+    <div class="tr-top">
+      <label for="tr-type">Задачи:</label>
+      <select id="tr-type"></select>
+    </div>
+    <div class="btns" role="group" aria-label="Сложность">
+      <button class="btn small chip on" data-d="0" type="button">Любые</button>
+      <button class="btn small chip" data-d="1" type="button">Лёгкие <span class="gems" data-gems="1"></span></button>
+      <button class="btn small chip" data-d="2" type="button">Средние <span class="gems" data-gems="2"></span></button>
+      <button class="btn small chip" data-d="3" type="button">Сложные <span class="gems" data-gems="3"></span></button>
+    </div>
+    <div class="tr-body">
+      <div class="tr-left">
+        <div class="badges"><span class="badge" id="tr-group"></span><span class="badge" id="tr-reward"></span></div>
+        <p class="kind" id="tr-name"></p>
+        <p class="tr-q" id="tr-q"></p>
+        <div class="tr-in">
+          <input id="tr-a" type="text" inputmode="numeric" autocomplete="off" aria-label="Ответ">
+          <span class="unit" id="tr-u"></span>
+          <button class="btn go" id="tr-check" type="button">Проверить</button>
+        </div>
+        <p class="fb" id="tr-fb" aria-live="polite"></p>
+        <div class="btns">
+          <button class="btn small" id="buy-hint" type="button">Подсказка <span class="price"><span class="ico" data-ico="em16"></span>1</span></button>
+          <button class="btn small" id="buy-step" type="button">Первый шаг <span class="price"><span class="ico" data-ico="em16"></span>2</span></button>
+          <button class="btn small" id="buy-sol" type="button">Всё решение <span class="price"><span class="ico" data-ico="em16"></span>3</span></button>
+        </div>
+        <div class="help" id="tr-help"></div>
+        <div class="btns"><button class="btn" id="tr-next" type="button">Следующая задача →</button></div>
+      </div>
+      <div class="slot figbox" id="tr-fig"></div>
+    </div>
+  </div>
+  <div class="panel">
+    <h3>Как играть</h3>
+    <div class="rules">
+      <div><b>Зарабатывай</b><ul>
+        <li>Лёгкая задача: <span class="gems" data-gems="1"></span> +1 изумруд</li>
+        <li>Средняя: <span class="gems" data-gems="2"></span> +2 изумруда</li>
+        <li>Сложная: <span class="gems" data-gems="3"></span> +3 изумруда</li>
+        <li>Если ответил со второй попытки, изумрудов на 1 меньше.</li>
+      </ul></div>
+      <div><b>Бонусы</b><ul>
+        <li>5 верных ответов подряд — <span class="ico" data-ico="di16"></span> алмаз.</li>
+        <li>Новый уровень — ещё <span class="ico" data-ico="di16"></span> алмаз.</li>
+        <li>Опыт: лёгкая +10, средняя +20, сложная +30. Уровень — каждые 50.</li>
+      </ul></div>
+      <div><b>Трать</b><ul>
+        <li>Подсказка — 1 изумруд.</li>
+        <li>Первый шаг решения — 2.</li>
+        <li>Всё решение — 3, но за эту задачу награды уже не будет.</li>
+        <li>Копи на предметы в сундуке.</li>
+      </ul></div>
+    </div>
+  </div>
+  <div class="panel">
+    <h3>Мои успехи</h3>
+    <div class="stats">
+      <div class="stat"><b id="st-right">0</b><span>верно с первой попытки</span></div>
+      <div class="stat"><b id="st-total">0</b><span>всего задач</span></div>
+      <div class="stat"><b id="st-best">0</b><span>лучшая серия</span></div>
+      <div class="stat"><b id="st-types">0</b><span>видов задач освоено</span></div>
+    </div>
+    <div class="confirm" id="reset-box"><button class="btn small" id="reset" type="button">Начать заново</button></div>
+  </div>
+</section>
+
+<section id="sunduk">
+  <h2>10. Сундук наград</h2>
+  <div class="panel">
+    <p>Покупай предметы за изумруды и алмазы. Чем больше решишь, тем лучше коллекция.</p>
+    <div class="btns"><button class="btn small" id="trade" type="button">Обменять <span class="price"><span class="ico" data-ico="em16"></span>8</span> на <span class="price"><span class="ico" data-ico="di16"></span>1</span></button></div>
+    <div class="items" id="items"></div>
+  </div>
+</section>
+
+<section id="oshibki">
+  <h2>11. Частые ошибки</h2>
+  <div class="panel mist">
+    <div><span class="x">✗</span><p>Сложили длину и ширину и забыли умножить на 2. <b>6 + 4 = 10</b> — это только половина периметра!</p></div>
+    <div><span class="x">✗</span><p>Для площади сложили стороны вместо умножения. Площадь — всегда <b>a · b</b>.</p></div>
+    <div><span class="x">✗</span><p>Периметр квадрата посчитали как <b>a · a</b>. Правильно <b>a · 4</b>, ведь у квадрата 4 стороны.</p></div>
+    <div><span class="x">✗</span><p>Написали площадь в <b>см</b>, а периметр в <b>см²</b>. Площадь — квадратные единицы, периметр — обычные.</p></div>
+    <div><span class="x">✗</span><p>Умножили дециметры на сантиметры. Сначала переводим всё в одни единицы.</p></div>
+    <div><span class="x">✗</span><p>Нашли ширину по периметру как <b>P − a</b>. Правильно: <b>P : 2 − a</b>.</p></div>
+    <div><span class="x">✗</span><p>В периметр сложной фигуры добавили пунктирную линию разреза. Считаем только внешние стороны.</p></div>
+  </div>
+</section>
+
+<section id="shpora">
+  <h2>12. Шпаргалка</h2>
+  <div class="panel tw">
+    <table>
+      <tr><th>Что ищем</th><th>Прямоугольник</th><th>Квадрат</th></tr>
+      <tr><td class="per">Периметр P</td><td>(a + b) · 2</td><td>a · 4</td></tr>
+      <tr><td class="area">Площадь S</td><td>a · b</td><td>a · a</td></tr>
+      <tr><td>Сторону по P</td><td>b = P : 2 − a</td><td>a = P : 4</td></tr>
+      <tr><td>Сторону по S</td><td>b = S : a</td><td>a · a = S (подбираем)</td></tr>
+      <tr><td>S, если знаем P и сторону</td><td>b = P : 2 − a, потом S = a · b</td><td>a = P : 4, потом S = a · a</td></tr>
+      <tr><td>P, если знаем S и сторону</td><td>b = S : a, потом P = (a + b) · 2</td><td>подбираем a, потом P = a · 4</td></tr>
+      <tr><td>Сложная фигура, S</td><td colspan="2">разрезать на прямоугольники и сложить, или достроить и вычесть</td></tr>
+      <tr><td>Сложная фигура, P</td><td colspan="2">сложить все внешние стороны</td></tr>
+    </table>
+  </div>
+</section>
+</div></div>
+<div class="toasts" id="toasts" aria-live="polite"></div>
+
+<script>
+const $=s=>document.querySelector(s);
+let rnd=Math.random;
+const R=(a,b)=>a+Math.floor(rnd()*(b-a+1));
+const pick=a=>a[Math.floor(rnd()*a.length)];
+const cm=n=>n+' см', m=n=>n+' м', dm=n=>n+' дм';
+function plural(n,a,b,c){const n10=n%10,n100=n%100;if(n10===1&&n100!==11)return a;if(n10>=2&&n10<=4&&(n100<10||n100>=20))return b;return c}
+
+/* ---------- пиксельные иконки ---------- */
+function pix(rows,pal,size){const h=rows.length,w=rows[0].length;let s=`<svg viewBox="0 0 ${w} ${h}" width="${size}" height="${Math.round(size*h/w)}" shape-rendering="crispEdges" aria-hidden="true">`;
+  rows.forEach((r,y)=>{[...r].forEach((ch,x)=>{if(ch!=='.')s+=`<rect x="${x}" y="${y}" width="1" height="1" fill="${pal[ch]}"/>`})});return s+'</svg>'}
+const EM=['...11...','..1221..','.123321.','12333321','12233221','.122221.','..1221..','...11...'],EMP={1:'#0a5c2b',2:'#1fae4f',3:'#7cf2a6'};
+const DI=['.111111.','13332221','12222221','.122221.','..1221..','...11...'],DIP={1:'#0e6e7c',2:'#35d0e0',3:'#c2fbff'};
+const em=s=>pix(EM,EMP,s), di=s=>pix(DI,DIP,s);
+const gems=n=>`<span class="gems" title="Сложность и награда: ${n}">${em(16).repeat(n)}</span>`;
+document.querySelectorAll('[data-ico]').forEach(e=>{const v=e.dataset.ico;e.innerHTML=v.startsWith('em')?em(+v.slice(2)):di(+v.slice(2))});
+document.querySelectorAll('[data-gems]').forEach(e=>e.innerHTML=em(14).repeat(+e.dataset.gems));
+
+/* ---------- рисунки ---------- */
+let clipN=0;
+const ln=(a,b,c,d,cls)=>`<line x1="${a}" y1="${b}" x2="${c}" y2="${d}" class="${cls}"/>`;
+function autoCell(w,h,max){return Math.max(8,Math.min(34,Math.floor((max||300)/Math.max(w,h))))}
+function edgeLabel(x1,y1,x2,y2,t){
+  const dx=x2-x1,dy=y2-y1,L=Math.hypot(dx,dy)||1,nx=dy/L,ny=-dx/L;
+  let x=(x1+x2)/2+nx*12,y=(y1+y2)/2+ny*12,anchor='middle';
+  if(nx>0.35)anchor='start';else if(nx<-0.35)anchor='end';
+  if(ny<-0.35)y-=2;else if(ny>0.35)y+=14;else y+=5;
+  return `<text x="${x.toFixed(1)}" y="${y.toFixed(1)}" text-anchor="${anchor}"${String(t).includes('?')?' class="q"':''}>${t}</text>`;
+}
+function fig(o){
+  const c=o.cell||autoCell(o.w,o.h,o.max),px=o.px??60,py=o.py??38;
+  const W=o.w*c,H=o.h*c,vw=Math.round(W+2*px),vh=Math.round(H+2*py);
+  const X=x=>+(px+x*c).toFixed(1),Y=y=>+(py+y*c).toFixed(1);
+  let s=`<svg class="fig" viewBox="0 0 ${vw} ${vh}" style="max-width:${vw}px" role="img" aria-label="${o.aria||'Рисунок к задаче'}">`;
+  if(o.full){for(let i=0;i<=o.w;i++)s+=ln(X(i),Y(0),X(i),Y(o.h),'g-faint');for(let j=0;j<=o.h;j++)s+=ln(X(0),Y(j),X(o.w),Y(j),'g-faint')}
+  const polys=o.polys||[];
+  polys.forEach(p=>{p.d='M'+p.pts.map(q=>X(q[0])+' '+Y(q[1])).join(' L')+' Z';
+    if(p.fill)s+=`<path d="${p.d}" class="${p.fill}"/>`;
+    if(p.grid){const id='cp'+(++clipN);s+=`<defs><clipPath id="${id}"><path d="${p.d}"/></clipPath></defs><g clip-path="url(#${id})">`;
+      for(let i=1;i<o.w;i++)s+=ln(X(i),Y(0),X(i),Y(o.h),'g-grid');for(let j=1;j<o.h;j++)s+=ln(X(0),Y(j),X(o.w),Y(j),'g-grid');
+      if(p.tile){for(let i=p.tile;i<o.w;i+=p.tile)s+=ln(X(i),Y(0),X(i),Y(o.h),'g-tile');for(let j=p.tile;j<o.h;j+=p.tile)s+=ln(X(0),Y(j),X(o.w),Y(j),'g-tile')}
+      s+='</g>'}
+  });
+  (o.lines||[]).forEach(l=>s+=ln(X(l[0]),Y(l[1]),X(l[2]),Y(l[3]),l[4]||'g-dash'));
+  polys.forEach(p=>{if(p.edge)s+=`<path d="${p.d}" class="${p.edge}"${p.id?` id="${p.id}"`:''}/>`});
+  if(o.extra)s+=o.extra(X,Y,c);
+  polys.forEach(p=>(p.labels||[]).forEach((t,i)=>{if(!t)return;const a=p.pts[i],b=p.pts[(i+1)%p.pts.length];s+=edgeLabel(X(a[0]),Y(a[1]),X(b[0]),Y(b[1]),t)}));
+  (o.texts||[]).forEach(t=>{s+=`<text class="c ${t[4]||''}${String(t[2]).includes('?')?' q':''}" x="${X(t[0])}" y="${Y(t[1])+6}" text-anchor="${t[3]||'middle'}">${t[2]}</text>`});
+  return s+'</svg>';
+}
+function rect(o){
+  const w=o.w,h=o.h,c=o.cell||autoCell(w,h,o.max);
+  const p={pts:[[0,0],[w,0],[w,h],[0,h]],labels:[o.top,o.right,o.bottom,o.left],fill:o.area?'g-fill':null,grid:o.area&&o.grid!==false,tile:o.tile,edge:o.perim?'g-per':'g-edge',id:o.id};
+  const cen=[].concat(o.center||[]);
+  const texts=cen.map((t,i)=>[w/2,h/2+(i-(cen.length-1)/2)*22/c,t]);
+  const extra=(X,Y)=>{let s='';
+    if(o.nums){let k=1;for(let j=0;j<h;j++)for(let i=0;i<w;i++)s+=`<text class="n" x="${X(i+.5)}" y="${Y(j+.5)+3.5}" text-anchor="middle">${k++}</text>`}
+    if(o.angles){const a=11;[[0,0,1,1],[w,0,-1,1],[0,h,1,-1],[w,h,-1,-1]].forEach(([x,y,dx,dy])=>{s+=`<path class="g-angle" d="M${X(x)+dx*a} ${Y(y)} V${Y(y)+dy*a} H${X(x)}"/>`})}
+    if(o.ticks){const t=7,tk=(x,y,v,n)=>{let r='';for(let i=0;i<n;i++){const f=(i-(n-1)/2)*6;r+=v?ln(x+f,y-t,x+f,y+t,'g-tick'):ln(x-t,y+f,x+t,y+f,'g-tick')}return r};
+      const n2=o.ticks==='sq'?1:2;s+=tk(X(w/2),Y(0),1,1)+tk(X(w/2),Y(h),1,1)+tk(X(0),Y(h/2),0,n2)+tk(X(w),Y(h/2),0,n2)}
+    return s};
+  return fig({w,h,cell:c,px:o.px,py:o.py,polys:[p],texts,extra,aria:o.aria||`Прямоугольник ${w} на ${h}`});
+}
+/* Г-фигура: прямоугольник W×H без верхнего правого угла cw×ch */
+function lFig(o){
+  const {W,H,cw,ch}=o,t=W-cw;
+  const pts=[[0,0],[t,0],[t,ch],[W,ch],[W,H],[0,H]];
+  const L=o.labels||[cm(t),cm(ch),cm(cw),cm(H-ch),cm(W),cm(H)];
+  const polys=[];
+  if(o.mode==='add')polys.push({pts:[[t,0],[W,0],[W,ch],[t,ch]],fill:'g-hatch',edge:'g-dashp'});
+  polys.push({pts,labels:L,fill:o.mode==='per'?null:'g-fill',grid:o.mode!=='per',edge:o.mode==='per'?'g-per':'g-edge'});
+  const lines=o.mode==='split'?[[0,ch,t,ch]]:[];
+  const texts=[];
+  if(o.mode==='split'&&o.inner){texts.push([t/2,ch/2,`${t}·${ch}`],[W/2,ch+(H-ch)/2,`${W}·${H-ch}`])}
+  if(o.mode==='add'&&o.inner){texts.push([t+cw/2,ch/2,`${cw}·${ch}`,'middle','q'])}
+  return fig({w:W,h:H,max:o.max||260,polys,lines,texts,aria:'Фигура в форме буквы Г'});
+}
+/* фигура из клеточек */
+function cellsFig(cells,W,H,c){
+  c=c||34;const px=22,py=22,X=x=>px+x*c,Y=y=>py+y*c,has=(x,y)=>cells.has(x+','+y);
+  let s=`<svg class="fig" viewBox="0 0 ${W*c+2*px} ${H*c+2*py}" style="max-width:${W*c+2*px}px" role="img" aria-label="Фигура из клеточек">`;
+  for(let i=0;i<=W;i++)s+=ln(X(i),Y(0),X(i),Y(H),'g-faint');for(let j=0;j<=H;j++)s+=ln(X(0),Y(j),X(W),Y(j),'g-faint');
+  cells.forEach(k=>{const [x,y]=k.split(',').map(Number);s+=`<rect x="${X(x)}" y="${Y(y)}" width="${c}" height="${c}" class="g-fill"/><rect x="${X(x)}" y="${Y(y)}" width="${c}" height="${c}" class="g-cell"/>`});
+  cells.forEach(k=>{const [x,y]=k.split(',').map(Number);
+    if(!has(x,y-1))s+=ln(X(x),Y(y),X(x+1),Y(y),'g-thick');if(!has(x,y+1))s+=ln(X(x),Y(y+1),X(x+1),Y(y+1),'g-thick');
+    if(!has(x-1,y))s+=ln(X(x),Y(y),X(x),Y(y+1),'g-thick');if(!has(x+1,y))s+=ln(X(x+1),Y(y),X(x+1),Y(y+1),'g-thick')});
+  return s+'</svg>';
+}
+const pair=(...a)=>`<div class="pair">${a.join('')}</div>`;
+
+/* ---------- виды задач ---------- */
+const GROUPS=[{id:'rect',name:'Прямоугольник'},{id:'sq',name:'Квадрат'},{id:'cx',name:'Сложные фигуры из прямоугольников'},{id:'un',name:'Единицы измерения'}];
+const TYPES=[
+ {id:'rP',g:'rect',d:1,name:'Периметр прямоугольника',gen(){const a=R(4,12),b=R(2,a-1),p=(a+b)*2;return{q:`Длина прямоугольника ${a} см, ширина ${b} см. Найди периметр.`,ans:p,u:'см',
+   f:rect({w:a,h:b,perim:true,top:cm(a),right:cm(b),bottom:cm(a),left:cm(b),center:'P = ?'}),
+   hint:'Периметр — сумма длин всех сторон. Формула: P = (a + b) · 2.',step:`Сложи длину и ширину: ${a} + ${b} = ${a+b} (см). Это половина пути вокруг.`,
+   steps:[`${a} + ${b} = ${a+b} (см) — половина периметра`,`${a+b} · 2 = ${p} (см)`]}}},
+ {id:'rS',g:'rect',d:1,name:'Площадь прямоугольника',gen(){const a=R(3,10),b=R(2,a-1);return{q:`Длина прямоугольника ${a} см, ширина ${b} см. Найди площадь.`,ans:a*b,u:'см²',
+   f:rect({w:a,h:b,area:true,top:cm(a),left:cm(b),center:'S = ?'}),
+   hint:'Площадь — сколько квадратиков 1 см² внутри. Формула: S = a · b.',step:`Внутри ${b} рядов по ${a} клеточек.`,steps:[`${a} · ${b} = ${a*b} (см²)`]}}},
+ {id:'rSideP',g:'rect',d:2,name:'Ширина по периметру',gen(){const a=R(5,12),b=R(2,a-1),p=(a+b)*2;return{q:`Периметр прямоугольника ${p} см, длина ${a} см. Найди ширину.`,ans:b,u:'см',
+   f:rect({w:a,h:b,perim:true,top:cm(a),bottom:cm(a),left:'? см',right:'? см',center:`P = ${p} см`}),
+   hint:'Длина и ширина вместе — это половина периметра.',step:`Половина периметра: ${p} : 2 = ${a+b} (см).`,
+   steps:[`${p} : 2 = ${a+b} (см) — длина и ширина вместе`,`${a+b} − ${a} = ${b} (см)`,`Проверка: (${a} + ${b}) · 2 = ${p} ✓`]}}},
+ {id:'rSideS',g:'rect',d:2,name:'Ширина по площади',gen(){const a=R(3,10),b=R(2,9),S=a*b;return{q:`Площадь прямоугольника ${S} см², длина ${a} см. Найди ширину.`,ans:b,u:'см',
+   f:rect({w:a,h:b,area:true,grid:false,top:cm(a),left:'? см',center:`S = ${S} см²`}),
+   hint:'S = a · b, значит ширина = S : a.',step:`Какое число нужно умножить на ${a}, чтобы получилось ${S}?`,
+   steps:[`${S} : ${a} = ${b} (см)`,`Проверка: ${a} · ${b} = ${S} ✓`]}}},
+ {id:'rSbyP',g:'rect',d:3,name:'Площадь, если известен периметр',gen(){const a=R(4,10),b=R(2,a-1),P=(a+b)*2;return{q:`Периметр прямоугольника ${P} см, ширина ${b} см. Найди площадь.`,ans:a*b,u:'см²',
+   f:rect({w:a,h:b,area:true,perim:true,grid:false,top:'? см',left:cm(b),center:[`P = ${P} см`,'S = ?']}),
+   hint:'Сначала найди длину через периметр, потом площадь.',step:`Половина периметра: ${P} : 2 = ${a+b} (см). Отними ширину, получишь длину.`,
+   steps:[`${P} : 2 = ${a+b} (см)`,`${a+b} − ${b} = ${a} (см) — длина`,`${a} · ${b} = ${a*b} (см²) — площадь`]}}},
+ {id:'rPbyS',g:'rect',d:3,name:'Периметр, если известна площадь',gen(){const a=R(4,10),b=R(2,a-1),S=a*b;return{q:`Площадь прямоугольника ${S} см², ширина ${b} см. Найди периметр.`,ans:(a+b)*2,u:'см',
+   f:rect({w:a,h:b,area:true,perim:true,grid:false,top:'? см',left:cm(b),center:[`S = ${S} см²`,'P = ?']}),
+   hint:'Сначала найди длину через площадь: S : b.',step:`Длина: ${S} : ${b} = ${a} (см).`,
+   steps:[`${S} : ${b} = ${a} (см) — длина`,`(${a} + ${b}) · 2 = ${(a+b)*2} (см)`]}}},
+ {id:'rTimes',g:'rect',d:2,name:'«В несколько раз больше или меньше»',gen(){const b=R(2,5),k=R(2,4),a=b*k,askS=rnd()<.5,what=askS?'площадь':'периметр';
+   const ans=askS?a*b:(a+b)*2,fin=askS?`${a} · ${b} = ${a*b} (см²)`:`(${a} + ${b}) · 2 = ${(a+b)*2} (см)`;
+   if(rnd()<.5)return{q:`Ширина прямоугольника ${b} см, а длина в ${k} раза больше. Найди ${what}.`,ans,u:askS?'см²':'см',
+     f:rect({w:a,h:b,area:askS,perim:!askS,grid:false,top:`${b} · ${k} = ?`,left:cm(b)}),hint:'«В несколько раз больше» — значит, умножаем.',step:`Длина: ${b} · ${k} = ${a} (см).`,steps:[`Длина: ${b} · ${k} = ${a} (см)`,fin]};
+   return{q:`Длина прямоугольника ${a} см, а ширина в ${k} раза меньше. Найди ${what}.`,ans,u:askS?'см²':'см',
+     f:rect({w:a,h:b,area:askS,perim:!askS,grid:false,top:cm(a),left:`${a} : ${k} = ?`,px:90}),hint:'«В несколько раз меньше» — значит, делим.',step:`Ширина: ${a} : ${k} = ${b} (см).`,steps:[`Ширина: ${a} : ${k} = ${b} (см)`,fin]}}},
+ {id:'rMore',g:'rect',d:2,name:'«На сколько-то больше или меньше»',gen(){const b=R(2,6),dd=R(1,5),a=b+dd,askS=rnd()<.5,what=askS?'площадь':'периметр';
+   const ans=askS?a*b:(a+b)*2,fin=askS?`${a} · ${b} = ${a*b} (см²)`:`(${a} + ${b}) · 2 = ${(a+b)*2} (см)`;
+   if(rnd()<.5)return{q:`Ширина прямоугольника ${b} см, а длина на ${dd} см больше. Найди ${what}.`,ans,u:askS?'см²':'см',
+     f:rect({w:a,h:b,area:askS,perim:!askS,grid:false,top:`${b} + ${dd} = ?`,left:cm(b)}),hint:'«На сколько-то больше» — значит, прибавляем.',step:`Длина: ${b} + ${dd} = ${a} (см).`,steps:[`Длина: ${b} + ${dd} = ${a} (см)`,fin]};
+   return{q:`Длина прямоугольника ${a} см, а ширина на ${dd} см меньше. Найди ${what}.`,ans,u:askS?'см²':'см',
+     f:rect({w:a,h:b,area:askS,perim:!askS,grid:false,top:cm(a),left:`${a} − ${dd} = ?`,px:90}),hint:'«На сколько-то меньше» — значит, вычитаем.',step:`Ширина: ${a} − ${dd} = ${b} (см).`,steps:[`Ширина: ${a} − ${dd} = ${b} (см)`,fin]}}},
+ {id:'rCompare',g:'rect',d:2,name:'Сравнить две площади',gen(){let a1,b1,a2,b2;do{a1=R(3,8);b1=R(2,6);a2=R(3,8);b2=R(2,6)}while(a1*b1===a2*b2);
+   const S1=a1*b1,S2=a2*b2,o=a1+2;
+   return{q:`Первая грядка — ${a1} м на ${b1} м, вторая — ${a2} м на ${b2} м. На сколько квадратных метров одна грядка больше другой?`,ans:Math.abs(S1-S2),u:'м²',
+   f:fig({w:a1+2+a2,h:Math.max(b1,b2),max:300,polys:[{pts:[[0,0],[a1,0],[a1,b1],[0,b1]],fill:'g-fill',grid:true,edge:'g-edge',labels:[m(a1),null,null,m(b1)]},{pts:[[o,0],[o+a2,0],[o+a2,b2],[o,b2]],fill:'g-fill',grid:true,edge:'g-edge',labels:[m(a2),m(b2),null,null]}],
+     texts:[[a1/2,b1+.9,'1-я','middle','nm'],[o+a2/2,b2+.9,'2-я','middle','nm']]}),
+   hint:'Найди площадь каждой грядки, потом из большей вычти меньшую.',step:`Первая: ${a1} · ${b1} = ${S1} (м²).`,
+   steps:[`Первая: ${a1} · ${b1} = ${S1} (м²)`,`Вторая: ${a2} · ${b2} = ${S2} (м²)`,`${Math.max(S1,S2)} − ${Math.min(S1,S2)} = ${Math.abs(S1-S2)} (м²)`]}}},
+
+ {id:'sqP',g:'sq',d:1,name:'Периметр квадрата',gen(){const a=R(2,12);return{q:`Сторона квадрата ${a} см. Найди периметр.`,ans:4*a,u:'см',
+   f:rect({w:a,h:a,perim:true,top:cm(a),right:cm(a),bottom:cm(a),left:cm(a),center:'P = ?'}),
+   hint:'У квадрата 4 одинаковые стороны. P = a · 4.',step:`Сложи 4 одинаковые стороны: ${a} + ${a} + ${a} + ${a}, или умножь ${a} на 4.`,steps:[`${a} · 4 = ${4*a} (см)`]}}},
+ {id:'sqS',g:'sq',d:1,name:'Площадь квадрата',gen(){const a=R(2,10);return{q:`Сторона квадрата ${a} см. Найди площадь.`,ans:a*a,u:'см²',
+   f:rect({w:a,h:a,area:true,top:cm(a),left:cm(a),center:'S = ?'}),
+   hint:'S = a · a: сторону умножаем саму на себя.',step:`Внутри ${a} рядов по ${a} клеточек.`,steps:[`${a} · ${a} = ${a*a} (см²)`]}}},
+ {id:'sqSideP',g:'sq',d:1,name:'Сторона квадрата по периметру',gen(){const a=R(2,12),P=4*a;return{q:`Периметр квадрата ${P} см. Найди его сторону.`,ans:a,u:'см',
+   f:rect({w:a,h:a,perim:true,top:'? см',center:`P = ${P} см`}),
+   hint:'Периметр квадрата — это 4 одинаковые стороны. Раздели на 4.',step:`Раздели ${P} на 4 равные части.`,steps:[`${P} : 4 = ${a} (см)`,`Проверка: ${a} · 4 = ${P} ✓`]}}},
+ {id:'sqSideS',g:'sq',d:2,name:'Сторона квадрата по площади',gen(){const a=R(2,10),S=a*a;return{q:`Площадь квадрата ${S} см². Найди его сторону.`,ans:a,u:'см',
+   f:rect({w:a,h:a,area:true,grid:false,top:'? см',center:`S = ${S} см²`}),
+   hint:'Подбери число, которое при умножении само на себя даёт площадь.',step:a>2?`Попробуй: ${a-1} · ${a-1} = ${(a-1)*(a-1)}. Мало — бери число больше.`:'Попробуй маленькие числа: 1 · 1, 2 · 2…',
+   steps:[`${a} · ${a} = ${S}`,`Значит, сторона ${a} см`]}}},
+ {id:'sqSameP',g:'sq',d:3,name:'Квадрат с таким же периметром',gen(){const s=R(3,8),a=s+R(1,s-1),b=2*s-a;return{q:`Стороны прямоугольника ${a} см и ${b} см. Найди площадь квадрата с таким же периметром.`,ans:s*s,u:'см²',
+   f:pair(rect({w:a,h:b,cell:18,perim:true,top:cm(a),left:cm(b),center:'P = ?'}),rect({w:s,h:s,cell:18,area:true,perim:true,top:'? см',center:'S = ?'})),
+   hint:'Сначала найди периметр прямоугольника, потом сторону квадрата, потом его площадь.',step:`Периметр прямоугольника: (${a} + ${b}) · 2 = ${4*s} (см).`,
+   steps:[`(${a} + ${b}) · 2 = ${4*s} (см) — периметр`,`${4*s} : 4 = ${s} (см) — сторона квадрата`,`${s} · ${s} = ${s*s} (см²)`]}}},
+ {id:'sqSameS',g:'sq',d:3,name:'Квадрат с такой же площадью',gen(){const [a,b,s]=pick([[8,2,4],[9,4,6],[12,3,6],[16,4,8],[18,2,6],[20,5,10],[25,4,10],[27,3,9],[16,1,4],[8,2,4]]);
+   return{q:`Длина прямоугольника ${a} см, ширина ${b} см. Найди периметр квадрата с такой же площадью.`,ans:4*s,u:'см',
+   f:pair(rect({w:a,h:b,cell:Math.min(18,220/a),area:true,grid:false,top:cm(a),left:cm(b),center:b>2?'S = ?':''}),rect({w:s,h:s,cell:Math.min(18,220/a),area:true,perim:true,grid:false,top:'? см',center:'P = ?'})),
+   hint:'Найди площадь прямоугольника. Потом подбери сторону квадрата с такой площадью.',step:`Площадь прямоугольника: ${a} · ${b} = ${s*s} (см²).`,
+   steps:[`${a} · ${b} = ${s*s} (см²) — площадь`,`${s} · ${s} = ${s*s}, значит сторона квадрата ${s} см`,`${s} · 4 = ${4*s} (см) — периметр`]}}},
+
+ {id:'cCount',g:'cx',d:1,name:'Фигура из клеточек',gen(){const W=7,H=5,cells=new Set(['3,2']),n=R(7,13);let guard=0;
+   while(cells.size<n&&guard++<500){const arr=[...cells],[x,y]=pick(arr).split(',').map(Number),[dx,dy]=pick([[1,0],[-1,0],[0,1],[0,-1]]),nx=x+dx,ny=y+dy;if(nx>=0&&ny>=0&&nx<W&&ny<H)cells.add(nx+','+ny)}
+   const rows=[];for(let y=0;y<H;y++){let k=0;for(let x=0;x<W;x++)if(cells.has(x+','+y))k++;if(k)rows.push(k)}
+   return{q:'Найди площадь фигуры. Одна клеточка — 1 см².',ans:cells.size,u:'см²',f:cellsFig(cells,W,H),
+   hint:'Площадь — сколько клеточек внутри. Считай по рядам, а потом сложи.',step:`В верхнем ряду фигуры ${rows[0]} ${plural(rows[0],'клетка','клетки','клеток')}.`,
+   steps:[`Считаем по рядам сверху вниз: ${rows.join(' + ')} = ${cells.size}`,`Площадь ${cells.size} см²`]}}},
+ {id:'cLS',g:'cx',d:2,name:'Площадь фигуры «Г» (разрезаем)',gen(){const W=R(4,8),H=R(4,7),cw=R(1,W-2),ch=R(1,H-2),t=W-cw,S=W*H-cw*ch;
+   return{q:'Найди площадь фигуры. Разрежь её на два прямоугольника.',ans:S,u:'см²',f:lFig({W,H,cw,ch,mode:'split'}),
+   hint:'Пунктир делит фигуру на два прямоугольника. Найди площадь каждого и сложи.',step:`Верхний прямоугольник: ${t} · ${ch} = ${t*ch} (см²).`,
+   steps:[`Верхний: ${t} · ${ch} = ${t*ch} (см²)`,`Нижний: ${W} · ${H-ch} = ${W*(H-ch)} (см²)`,`Вместе: ${t*ch} + ${W*(H-ch)} = ${S} (см²)`]}}},
+ {id:'cLC',g:'cx',d:3,name:'Площадь фигуры «Г» (достраиваем)',gen(){const W=R(4,8),H=R(4,7),cw=R(1,W-2),ch=R(1,H-2),S=W*H-cw*ch;
+   return{q:'Найди площадь фигуры. Подсказка на рисунке: её можно достроить до прямоугольника.',ans:S,u:'см²',
+   f:lFig({W,H,cw,ch,mode:'add',labels:[null,cm(ch),cm(cw),null,cm(W),cm(H)]}),
+   hint:'Найди площадь большого прямоугольника и вычти вырезанный угол (фиолетовый).',step:`Большой прямоугольник: ${W} · ${H} = ${W*H} (см²).`,
+   steps:[`Большой прямоугольник: ${W} · ${H} = ${W*H} (см²)`,`Вырезанный угол: ${cw} · ${ch} = ${cw*ch} (см²)`,`${W*H} − ${cw*ch} = ${S} (см²)`]}}},
+ {id:'cLP',g:'cx',d:2,name:'Периметр фигуры «Г»',gen(){const W=R(4,8),H=R(4,7),cw=R(1,W-2),ch=R(1,H-2),t=W-cw,sides=[t,ch,cw,H-ch,W,H],P=sides.reduce((a,b)=>a+b);
+   return{q:'Найди периметр фигуры.',ans:P,u:'см',f:lFig({W,H,cw,ch,mode:'per'}),
+   hint:'Обойди фигуру по краю и сложи все стороны. Сторон тут 6.',step:`Начни сверху и иди по часовой стрелке: ${t} + ${ch} + …`,
+   steps:[`${sides.join(' + ')} = ${P} (см)`]}}},
+ {id:'cStair',g:'cx',d:3,name:'Периметр фигуры-лесенки',gen(){const W=R(5,9),H=R(4,7),s1=R(1,W-3),s2=R(s1+1,W-1),h1=R(1,H-2),h2=R(h1+1,H-1),P=(W+H)*2;
+   const pts=[[0,0],[s1,0],[s1,h1],[s2,h1],[s2,h2],[W,h2],[W,H],[0,H]];
+   return{q:'Найди периметр фигуры-лесенки. Известны только две стороны.',ans:P,u:'см',
+   f:fig({w:W,h:H,max:260,lines:[[s1,0,W,0],[W,0,W,h2]],polys:[{pts,edge:'g-per',labels:[null,null,null,null,null,null,cm(W),cm(H)]}]}),
+   hint:'Сдвинь ступеньки наружу (пунктир) — получится прямоугольник с таким же периметром.',step:`Все горизонтальные ступеньки вместе равны нижней стороне: ${W} см.`,
+   steps:[`Горизонтальные ступеньки вместе равны нижней стороне: ${W} см`,`Вертикальные ступеньки вместе равны левой стороне: ${H} см`,`P = (${W} + ${H}) · 2 = ${P} (см)`]}}},
+ {id:'cPond',g:'cx',d:3,name:'Огород с прудом',gen(){const W=R(6,10),H=R(5,8),p=R(1,W-3),q=R(1,H-3),x=R(1,W-p-1),y=R(1,H-q-1),S=W*H-p*q;
+   return{q:`Огород ${W} м на ${H} м. Посреди огорода — пруд ${p} м на ${q} м. Какую площадь занимают грядки (всё, кроме пруда)?`,ans:S,u:'м²',
+   f:fig({w:W,h:H,max:280,polys:[{pts:[[0,0],[W,0],[W,H],[0,H]],fill:'g-fill',grid:true,edge:'g-edge',labels:[m(W),null,null,m(H)]},{pts:[[x,y],[x+p,y],[x+p,y+q],[x,y+q]],fill:'g-water',edge:'g-edge'}],
+     texts:[[x+p/2,y+q/2,`${p}×${q}`]]}),
+   hint:'Найди площадь всего огорода и вычти площадь пруда.',step:`Весь огород: ${W} · ${H} = ${W*H} (м²).`,
+   steps:[`Весь огород: ${W} · ${H} = ${W*H} (м²)`,`Пруд: ${p} · ${q} = ${p*q} (м²)`,`${W*H} − ${p*q} = ${S} (м²)`]}}},
+ {id:'cTile',g:'cx',d:3,name:'Сколько нужно плиток',gen(){const k=pick([2,3]),nx=R(2,5),ny=R(2,4),a=k*nx,b=k*ny;
+   return{q:`Стену ${a} дм на ${b} дм выкладывают квадратными плитками со стороной ${k} дм. Сколько нужно плиток?`,ans:nx*ny,u:'шт.',
+   f:rect({w:a,h:b,area:true,tile:k,top:dm(a),left:dm(b),max:280}),
+   hint:'Узнай, сколько плиток поместится в один ряд и сколько будет рядов.',step:`В один ряд поместится ${a} : ${k} = ${nx} ${plural(nx,'плитка','плитки','плиток')}.`,
+   steps:[`В ряд: ${a} : ${k} = ${nx}, рядов: ${b} : ${k} = ${ny}`,`${nx} · ${ny} = ${nx*ny} (плиток)`,`Другой способ: площадь стены ${a} · ${b} = ${a*b} дм², плитки ${k} · ${k} = ${k*k} дм², ${a*b} : ${k*k} = ${nx*ny}`]}}},
+ {id:'cMaxS',g:'cx',d:3,name:'Наибольшая площадь при данном периметре',gen(){const n=R(4,10),P=2*n,best=Math.floor(n/2)*Math.ceil(n/2),pairs=[];for(let i=1;i<=Math.floor(n/2);i++)pairs.push(`${n-i} и ${i} → ${(n-i)*i} см²`);
+   return{q:`Из проволоки длиной ${P} см сгибают прямоугольник. Стороны — целые сантиметры. Какую наибольшую площадь он может иметь?`,ans:best,u:'см²',
+   f:rect({w:5,h:3,cell:40,perim:true,center:[`P = ${P} см`,'S = ?']}),
+   hint:'Длина + ширина = P : 2. Перебери все пары и сравни площади. Чем ближе к квадрату, тем больше площадь.',step:`Длина + ширина = ${P} : 2 = ${n} (см).`,
+   steps:[`Длина + ширина = ${P} : 2 = ${n} (см)`,`Пары: ${pairs.join('; ')}`,`Наибольшая площадь — ${best} см²`]}}},
+
+ {id:'rUnits',g:'un',d:2,name:'Стороны в разных единицах',gen(){const a=R(1,3),b=R(3,9),A=a*10,askS=rnd()<.5;
+   return{q:`Длина прямоугольника ${a} дм, ширина ${b} см. Найди ${askS?'площадь':'периметр'}.`,ans:askS?A*b:(A+b)*2,u:askS?'см²':'см',
+   f:rect({w:A,h:b,cell:Math.min(26,280/A),area:askS,perim:!askS,grid:false,top:`${a} дм = ? см`,left:cm(b)}),
+   hint:'Сначала переведи всё в сантиметры: 1 дм = 10 см.',step:`${a} дм = ${A} см.`,
+   steps:[`${a} дм = ${A} см`,askS?`${A} · ${b} = ${A*b} (см²)`:`(${A} + ${b}) · 2 = ${(A+b)*2} (см)`]}}},
+ {id:'uArea',g:'un',d:2,name:'Перевод единиц площади',gen(){const x=R(2,9),v=R(0,3),dmFig=rect({w:10,h:10,cell:18,area:true,top:'10 см = 1 дм',left:'10 см',px:66,center:'100 см²'});
+   const V=[{q:`Сколько квадратных сантиметров в ${x} дм²?`,ans:x*100,u:'см²',s:`${x} · 100 = ${x*100} (см²)`},
+     {q:`Сколько квадратных дециметров в ${x} м²?`,ans:x*100,u:'дм²',s:`${x} · 100 = ${x*100} (дм²)`},
+     {q:`${x*100} см² — это сколько квадратных дециметров?`,ans:x,u:'дм²',s:`${x*100} : 100 = ${x} (дм²)`},
+     {q:`${x*100} дм² — это сколько квадратных метров?`,ans:x,u:'м²',s:`${x*100} : 100 = ${x} (м²)`}][v];
+   return{q:V.q,ans:V.ans,u:V.u,f:dmFig,hint:'1 дм² = 100 см², и 1 м² = 100 дм². Не 10, а 100!',step:v<2?'Каждая большая единица — это 100 маленьких. Умножай на 100.':'100 маленьких единиц — это одна большая. Дели на 100.',steps:[V.s]}}},
+ {id:'uSq',g:'un',d:3,name:'Квадрат: дм в см²',gen(){const a=R(1,3),A=a*10;return{q:`Сторона квадрата ${a} дм. Найди его площадь в квадратных сантиметрах.`,ans:A*A,u:'см²',
+   f:rect({w:10,h:10,cell:18,area:true,grid:false,top:`${a} дм`,left:`${a} дм`,center:'S = ? см²'}),
+   hint:'Переведи сторону в сантиметры: 1 дм = 10 см. Потом умножь сторону на сторону.',step:`${a} дм = ${A} см.`,steps:[`${a} дм = ${A} см`,`${A} · ${A} = ${A*A} (см²)`]}}}
+];
+
+/* ---------- теория: рисунки ---------- */
+$('#f-rect').innerHTML=rect({w:7,h:4,cell:32,angles:true,ticks:'rect',top:'a',bottom:'a',left:'b',right:'b',aria:'Прямоугольник с равными противоположными сторонами'});
+$('#f-sq').innerHTML=rect({w:5,h:5,cell:32,angles:true,ticks:'sq',top:'a',bottom:'a',left:'a',right:'a',aria:'Квадрат'});
+$('#f-per').innerHTML=rect({w:6,h:4,cell:34,perim:true,top:'6 см',bottom:'6 см',left:'4 см',right:'4 см',center:'P = 20 см'});
+$('#f-area').innerHTML=rect({w:6,h:4,cell:34,area:true,nums:true,top:'6 см',left:'4 см'});
+$('#f-vs').innerHTML=rect({w:7,h:4,cell:32,area:true,perim:true,top:'7 м',left:'4 м',center:['S = 28 м²','P = 22 м']});
+$('#f-dm').innerHTML=rect({w:10,h:10,cell:20,area:true,top:'10 см = 1 дм',left:'10 см',px:66,center:'100 см²'});
+$('#f-split').innerHTML=lFig({W:6,H:5,cw:3,ch:3,mode:'split',inner:true});
+$('#f-add').innerHTML=lFig({W:6,H:5,cw:3,ch:3,mode:'add',inner:true});
+
+/* ---------- лаборатория ---------- */
+const la=$('#la'),lb=$('#lb'),lsq=$('#lsq'),lnum=$('#lnum');
+function lab(){if(lsq.checked)lb.value=la.value;lb.disabled=lsq.checked;const a=+la.value,b=+lb.value;
+  $('#lav').textContent=cm(a);$('#lbv').textContent=cm(b);
+  $('#lfig').innerHTML=rect({w:a,h:b,max:320,area:true,nums:lnum.checked,id:'lab-edge',top:cm(a),bottom:cm(a),left:cm(b),right:cm(b)});
+  if(a===b){$('#lp').textContent=`P = ${a} · 4 = ${4*a} см`;$('#ls').textContent=`S = ${a} · ${a} = ${a*a} см²`}
+  else{$('#lp').textContent=`P = (${a} + ${b}) · 2 = ${(a+b)*2} см`;$('#ls').textContent=`S = ${a} · ${b} = ${a*b} см²`}}
+[la,lb,lsq,lnum].forEach(e=>e.addEventListener('input',lab));lab();
+$('#lwalk').addEventListener('click',()=>{const e=document.getElementById('lab-edge');if(!e)return;const a=+la.value,b=+lb.value;
+  e.setAttribute('class','g-per');$('#lp').textContent=`${a} + ${b} + ${a} + ${b} = ${(a+b)*2} см`;
+  if(matchMedia('(prefers-reduced-motion: reduce)').matches)return;const L=e.getTotalLength();
+  e.style.transition='none';e.style.strokeDasharray=L;e.style.strokeDashoffset=L;e.getBoundingClientRect();
+  e.style.transition='stroke-dashoffset 2.4s linear';e.style.strokeDashoffset=0});
+
+/* ---------- примеры всех видов ---------- */
+function mulberry32(a){return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
+(function(){rnd=mulberry32(2026);let h='';
+  GROUPS.forEach(g=>{h+=`<h3 class="grp">${g.name}</h3><div class="ex-grid">`;
+    TYPES.filter(t=>t.g===g.id).forEach(t=>{const d=t.gen();
+      h+=`<article class="panel"><div class="ex-head"><span class="kind">${t.name}</span>${gems(t.d)}</div><p class="cond">${d.q}</p><div class="slot figbox">${d.f}</div>
+      <ol class="steps">${d.steps.map(x=>`<li>${x}</li>`).join('')}</ol><span class="ans">Ответ: ${d.ans} ${d.u}</span><p class="hint">${d.hint}</p>
+      <div class="ex-foot"><span class="done-n" data-done="${t.id}"></span><button class="btn small" type="button" data-train="${t.id}">Решать такие</button></div></article>`});
+    h+='</div>'});
+  $('#examples').innerHTML=h;rnd=Math.random})();
+
+/* ---------- состояние ---------- */
+const KEY='kubik-geometry-v1',LV=50;
+let S={em:3,di:0,xp:0,streak:0,best:0,right:0,total:0,solved:{},items:[]};
+try{const v=JSON.parse(localStorage.getItem(KEY));if(v&&typeof v==='object')S=Object.assign(S,v)}catch(e){}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
+const level=()=>Math.floor(S.xp/LV)+1;
+function bump(el){el.classList.remove('bump');void el.offsetWidth;el.classList.add('bump')}
+function toast(html){const t=document.createElement('div');t.className='toast';t.innerHTML=html;const box=$('#toasts');box.appendChild(t);while(box.children.length>3)box.firstChild.remove();setTimeout(()=>t.remove(),2900)}
+
+/* ---------- сундук ---------- */
+const SW=['...11...','..1221..','..1221..','..1221..','..1221..','..1221..','.744447.','...55...','...55...','...66...'];
+const ITEMS=[
+ {id:'apple',name:'Яблоко',em:3,di:0,map:['....5...','...5.66.','.112211.','12322221','12222221','12222221','.122221.','..1111..'],pal:{1:'#8f1414',2:'#e0302a',3:'#ff9a8a',5:'#6b4220',6:'#3fa535'}},
+ {id:'torch',name:'Факел',em:5,di:0,map:['...44...','..3443..','..3443..','...55...','...55...','...55...','...55...','...66...'],pal:{3:'#f39a1d',4:'#ffe25a',5:'#7a5230',6:'#4e3218'}},
+ {id:'isword',name:'Железный меч',em:8,di:0,map:SW,pal:{1:'#3b3b3b',2:'#dfe6ea',4:'#6b4a2b',7:'#3b3b3b',5:'#7a5230',6:'#4e3218'}},
+ {id:'gpick',name:'Золотая кирка',em:12,di:0,map:['.111111.','12222221','1..55..1','...55...','...55...','...55...','...55...','...66...'],pal:{1:'#8a6a10',2:'#f6d046',5:'#7a5230',6:'#4e3218'}},
+ {id:'shield',name:'Щит',em:15,di:0,map:['11111111','12222221','12233221','12233221','12222221','.122221.','..1221..','...11...'],pal:{1:'#4a4a4a',2:'#9b6b3d',3:'#d0d0d0'}},
+ {id:'potion',name:'Зелье',em:18,di:0,map:['...11...','...22...','..1..1..','.133331.','13344331','13333331','.133331.','..1111..'],pal:{1:'#3d3d66',2:'#a0703a',3:'#b04fd8',4:'#efb2ff'}},
+ {id:'dsword',name:'Алмазный меч',em:20,di:1,map:SW,pal:{1:'#0e6e7c',2:'#63f1f1',4:'#f6d046',7:'#8a6a10',5:'#7a5230',6:'#4e3218'}},
+ {id:'crown',name:'Корона',em:25,di:2,map:['2..22..2','22.22.22','22222222','23222232','22222222','11111111'],pal:{1:'#8a6a10',2:'#f6d046',3:'#e0302a'}},
+ {id:'cup',name:'Кубок чемпиона',em:30,di:3,map:['11111111','1.2222.1','.122221.','..1221..','...22...','...22...','..1111..','.111111.'],pal:{1:'#a07a12',2:'#ffd84a'}}
+];
+function renderItems(){$('#items').innerHTML=ITEMS.map(it=>{const own=S.items.includes(it.id),can=S.em>=it.em&&S.di>=it.di;
+  return `<div class="item ${own?'own':'locked'}"><div class="pic">${pix(it.map,it.pal,44)}</div><span class="nm">${it.name}</span>
+  <span class="pr"><span class="res">${em(16)}${it.em}</span>${it.di?`<span class="res">${di(16)}${it.di}</span>`:''}</span>
+  ${own?'<span class="nm">Есть!</span>':`<button class="btn small go" type="button" data-buy="${it.id}"${can?'':' disabled'}>Купить</button>`}</div>`}).join('')}
+$('#items').addEventListener('click',e=>{const b=e.target.closest('[data-buy]');if(!b)return;const it=ITEMS.find(i=>i.id===b.dataset.buy);
+  if(!it||S.items.includes(it.id)||S.em<it.em||S.di<it.di)return;S.em-=it.em;S.di-=it.di;S.items.push(it.id);save();ui();
+  toast(`${pix(it.map,it.pal,28)}<span>Новый предмет: <span class="y">${it.name}</span></span>`)});
+$('#trade').addEventListener('click',()=>{if(S.em<8)return;S.em-=8;S.di++;save();ui();toast(`${di(22)}<span>Обмен: <span class="y">+1 алмаз</span></span>`)});
+
+/* ---------- интерфейс ---------- */
+function ui(){
+  $('#h-em').textContent=S.em;$('#h-di').textContent=S.di;$('#h-streak').textContent=S.streak;
+  $('#h-lvl').textContent='Ур. '+level();$('#h-bar').style.width=(S.xp%LV)/LV*100+'%';
+  $('#st-right').textContent=S.right;$('#st-total').textContent=S.total;$('#st-best').textContent=S.best;
+  $('#st-types').textContent=`${TYPES.filter(t=>S.solved[t.id]).length} / ${TYPES.length}`;
+  document.querySelectorAll('[data-done]').forEach(e=>{const n=S.solved[e.dataset.done]||0;e.textContent=n?`Решено: ${n}`:'Ещё не решал';e.classList.toggle('yes',n>0)});
+  $('#trade').disabled=S.em<8;
+  if(cur){const off=cur.done;
+    $('#buy-hint').disabled=off||cur.hint||S.em<1;$('#buy-step').disabled=off||cur.step||S.em<2;$('#buy-sol').disabled=off||cur.sol||S.em<3}
+  renderItems();
+}
+
+/* ---------- тренажёр ---------- */
+let cur=null,last=null,mode='all',diff=0;
+const sel=$('#tr-type');
+sel.innerHTML='<option value="all">Все виды вперемешку</option>'+GROUPS.map(g=>`<optgroup label="${g.name}">${TYPES.filter(t=>t.g===g.id).map(t=>`<option value="${t.id}">${t.name} (${['','лёгкая','средняя','сложная'][t.d]})</option>`).join('')}</optgroup>`).join('');
+function pickType(){let c=mode!=='all'?TYPES.filter(t=>t.id===mode):diff?TYPES.filter(t=>t.d===diff):TYPES;
+  if(c.length>1)c=c.filter(t=>t.id!==last);
+  const w=c.map(t=>1/(1+(S.solved[t.id]||0)));let r=Math.random()*w.reduce((a,b)=>a+b),i=0;while(r>w[i]&&i<c.length-1){r-=w[i];i++}return c[i]}
+function newTask(saved){let t=null,seed=0;
+  if(saved&&saved.id){t=TYPES.find(x=>x.id===saved.id)||null;seed=saved.seed|0}
+  if(!t){t=pickType();seed=Math.floor(Math.random()*2147483647);saved=null}
+  last=t.id;rnd=mulberry32(seed);const d=t.gen();rnd=Math.random;
+  cur={t,d,seed,tries:0,hint:false,step:false,sol:false,done:false};
+  $('#tr-group').textContent=GROUPS.find(g=>g.id===t.g).name;$('#tr-reward').innerHTML='Награда '+gems(t.d);
+  $('#tr-name').textContent=t.name;$('#tr-q').textContent=d.q;$('#tr-u').textContent=d.u;$('#tr-fig').innerHTML=d.f;
+  $('#tr-a').value='';$('#tr-fb').textContent='';$('#tr-fb').className='fb';$('#tr-help').innerHTML='';
+  if(saved){cur.tries=saved.tries||0;cur.hint=!!saved.hint;cur.step=!!saved.step;cur.sol=!!saved.sol;$('#tr-a').value=saved.a||'';
+    if(cur.hint)addHelp('Подсказка',cur.d.hint);if(cur.step)addHelp('Первый шаг',cur.d.step);
+    if(cur.sol)addHelp('Решение',solHtml()+'<p class="hint">За эту задачу награды уже не будет, но разобраться важнее!</p>');
+    $('#tr-fb').textContent='Продолжаем задачу, которую ты не дорешал.';$('#tr-fb').className='fb'}
+  keepCur();ui()}
+function keepCur(){S.cur=cur&&!cur.done?{id:cur.t.id,seed:cur.seed,tries:cur.tries,hint:cur.hint,step:cur.step,sol:cur.sol,a:$('#tr-a').value}:null;save()}
+function addHelp(title,html){const d=document.createElement('div');d.innerHTML=`<b class="t">${title}</b>${html}`;$('#tr-help').appendChild(d)}
+const solHtml=()=>`<ol class="steps">${cur.d.steps.map(x=>`<li>${x}</li>`).join('')}<li><b>Ответ: ${cur.d.ans} ${cur.d.u}</b></li></ol>`;
+function buy(kind,price){if(!cur||cur.done||cur[kind]||S.em<price)return;S.em-=price;cur[kind]=true;bump($('#h-em'));
+  if(kind==='hint')addHelp('Подсказка',cur.d.hint);
+  if(kind==='step')addHelp('Первый шаг',cur.d.step);
+  if(kind==='sol')addHelp('Решение',solHtml()+'<p class="hint">За эту задачу награды уже не будет, но разобраться важнее!</p>');
+  keepCur();ui()}
+$('#buy-hint').addEventListener('click',()=>buy('hint',1));
+$('#buy-step').addEventListener('click',()=>buy('step',2));
+$('#buy-sol').addEventListener('click',()=>buy('sol',3));
+function parseNum(s){const r=String(s).replace(',','.').match(/\d+(\.\d+)?/);return r?Number(r[0]):null}
+function check(){if(!cur||cur.done)return;const v=parseNum($('#tr-a').value),fb=$('#tr-fb');
+  if(v===null){fb.textContent='Впиши число в окошко.';fb.className='fb no';return}
+  cur.tries++;if(cur.tries===1)S.total++;
+  if(v===cur.d.ans){cur.done=true;const id=cur.t.id;
+    if(cur.sol){fb.textContent='Верно! Решение было открыто, поэтому без награды.';fb.className='fb ok'}
+    else{const gain=Math.max(0,cur.t.d-(cur.tries>1?1:0)),xp=cur.t.d*10,oldL=level();
+      S.em+=gain;S.xp+=xp;S.solved[id]=(S.solved[id]||0)+1;
+      if(cur.tries===1){S.right++;S.streak++;S.best=Math.max(S.best,S.streak);
+        if(S.streak%5===0){S.di++;bump($('#h-di'));const k=S.streak;setTimeout(()=>toast(`${di(22)}<span>${k} подряд! <span class="y">+1 алмаз</span></span>`),400)}}
+      if(level()>oldL){S.di++;bump($('#h-di'));const L=level();setTimeout(()=>toast(`${di(22)}<span>Уровень ${L}! <span class="y">+1 алмаз</span></span>`),800)}
+      fb.textContent=`Верно! +${gain} ${plural(gain,'изумруд','изумруда','изумрудов')}, +${xp} опыта`;fb.className='fb ok';
+      if(gain)toast(`${em(22)}<span class="y">+${gain} ${plural(gain,'изумруд','изумруда','изумрудов')}</span>`);bump($('#h-em'))}
+    if(!cur.sol)addHelp('Как решали',solHtml());
+    keepCur();ui();$('#tr-next').focus()}
+  else{S.streak=0;fb.className='fb no';
+    fb.textContent=cur.tries===1&&!cur.sol?(cur.t.d>1?'Пока неверно. Проверь вычисления. Награда станет на 1 изумруд меньше.':'Пока неверно. Проверь вычисления или возьми подсказку.'):'Снова не то. Посмотри на рисунок или возьми подсказку.';
+    keepCur();ui()}}
+$('#tr-check').addEventListener('click',check);
+$('#tr-a').addEventListener('keydown',e=>{if(e.key==='Enter')check()});
+$('#tr-a').addEventListener('input',()=>{if(cur&&!cur.done)keepCur()});
+$('#tr-next').addEventListener('click',newTask);
+sel.addEventListener('change',()=>{mode=sel.value;if(mode!=='all'){diff=0;setChips()}newTask()});
+function setChips(){document.querySelectorAll('.chip').forEach(c=>c.classList.toggle('on',+c.dataset.d===diff))}
+document.querySelectorAll('.chip').forEach(c=>c.addEventListener('click',()=>{diff=+c.dataset.d;mode='all';sel.value='all';setChips();newTask()}));
+$('#examples').addEventListener('click',e=>{const b=e.target.closest('[data-train]');if(!b)return;mode=b.dataset.train;sel.value=mode;diff=0;setChips();newTask();
+  document.getElementById('trener').scrollIntoView({behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth'})});
+$('#reset-box').addEventListener('click',e=>{const box=$('#reset-box');
+  if(e.target.id==='reset')box.innerHTML='<span><b>Точно стереть весь прогресс и предметы?</b></span><button class="btn small" id="reset-yes" type="button">Да, стереть</button><button class="btn small go" id="reset-no" type="button">Нет</button>';
+  if(e.target.id==='reset-yes'){S={em:3,di:0,xp:0,streak:0,best:0,right:0,total:0,solved:{},items:[]};save();newTask();toast('<span>Прогресс обнулён. <span class="y">Начинаем с нуля!</span></span>')}
+  if(e.target.id==='reset-yes'||e.target.id==='reset-no')box.innerHTML='<button class="btn small" id="reset" type="button">Начать заново</button>'});
+newTask(S.cur);
+
+/* ---------- пиксельный фон ---------- */
+function drawBg(){const cv=$('#bg'),P=8,w=Math.ceil(innerWidth/P),h=Math.ceil(innerHeight/P);cv.width=w;cv.height=h;const g=cv.getContext('2d'),r=mulberry32(99);
+  const sky=['#6f9df5','#7eaaf8','#8db6fb','#9dc2fd','#adcdff','#bdd8ff'];
+  for(let y=0;y<h;y++){g.fillStyle=sky[Math.min(5,Math.floor(y/h*7))];g.fillRect(0,y,w,1)}
+  g.fillStyle='#fff3a6';g.fillRect(w-16,4,7,7);g.fillStyle='#fffbe0';g.fillRect(w-14,6,3,3);
+  for(let i=0;i<Math.max(3,w/25);i++){const cx=Math.floor(r()*w),cy=3+Math.floor(r()*h*.3),cw=8+Math.floor(r()*10);g.fillStyle='#ffffff';g.fillRect(cx,cy,cw,3);g.fillRect(cx+2,cy-2,cw-5,2);g.fillStyle='#e6eefc';g.fillRect(cx,cy+3,cw,1)}
+  const base=h-Math.max(8,Math.round(h*.14));
+  for(let x=0;x<w;x++){const top=base+Math.round(Math.sin(x*.13)*1.5+Math.sin(x*.041)*2.5);
+    for(let y=top;y<h;y++){const d=y-top;let c;
+      if(d<1)c=pick2(r,['#5fa83a','#6bb944','#559c33']);else if(d<2)c=pick2(r,['#4f9a30','#5fa83a','#86603c']);
+      else if(d<6)c=pick2(r,['#86603c','#7a5432','#93693f','#6f4b2c']);
+      else{c=pick2(r,['#7d7d7d','#8a8a8a','#6e6e6e','#777777']);const o=r();if(o<.012)c='#22d36a';else if(o<.02)c='#5ae6f2';else if(o<.04)c='#2b2b2b'}
+      g.fillStyle=c;g.fillRect(x,y,1,1)}
+    if(r()<.035&&x>2&&x<w-3){g.fillStyle='#6b4a2b';g.fillRect(x,top-5,1,5);g.fillStyle='#3f8f2c';g.fillRect(x-2,top-9,5,4);g.fillStyle='#4fa336';g.fillRect(x-1,top-10,3,1)}}}
+function pick2(r,a){return a[Math.floor(r()*a.length)]}
+drawBg();let bgT;addEventListener('resize',()=>{clearTimeout(bgT);bgT=setTimeout(drawBg,150)});
+</script>
+<script>
+if('serviceWorker' in navigator){addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}))}
+try{navigator.storage&&navigator.storage.persist&&navigator.storage.persist()}catch(e){}
+</script>
+</body>
+</html>
