@@ -33,7 +33,7 @@
 *{box-sizing:border-box}
 body{background:var(--sky);color:var(--ink);font-family:var(--f-body);font-size:17px;line-height:1.55}
 #bg{position:fixed;inset:0;width:100%;height:100%;z-index:-1;image-rendering:pixelated;image-rendering:crisp-edges}
-.page{padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:24px 120px}
+.page{padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:24px calc(140px + env(safe-area-inset-bottom,0px))}
 .wrap{max-width:900px;margin:0 auto;display:flex;flex-direction:column;gap:40px}
 h1,h2,h3{font-family:var(--f-pix);font-weight:700;margin:0;line-height:1.15;text-wrap:balance}
 h1{font-size:clamp(1.9rem,7vw,3rem);color:#fff;text-shadow:0 2px 6px rgba(0,0,0,.45);letter-spacing:-.01em}
@@ -43,8 +43,9 @@ p{margin:0}
 .sub{color:#fff;text-shadow:0 1px 4px rgba(0,0,0,.5);font-size:1.1rem;font-weight:600}
 
 /* HUD */
-.hud{position:sticky;top:env(safe-area-inset-top,0px);z-index:10;background:var(--hud);border-bottom:3px solid #000;color:var(--hud-ink);
-  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:8px}
+.hud{position:fixed;left:0;right:0;bottom:0;z-index:10;background:var(--hud);border-top:3px solid #000;color:var(--hud-ink);
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-top:10px;padding-bottom:calc(10px + env(safe-area-inset-bottom,0px))}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:11;background:#6f9df5}
 .hud-in{max-width:900px;margin:0 auto;display:flex;flex-wrap:wrap;align-items:center;gap:10px 18px;font-family:var(--f-pix);font-size:1.05rem;font-weight:600}
 .res{display:inline-flex;align-items:center;gap:6px;font-variant-numeric:tabular-nums}
 .res b{min-width:1.5ch}
@@ -52,6 +53,7 @@ p{margin:0}
 .lvl{color:var(--xp);font-weight:700;min-width:4.5ch}
 .bar{flex:1;height:12px;background:#000;border:2px solid #000;box-shadow:inset 0 0 0 2px #3a3a3a}
 .bar i{display:block;height:100%;width:0;background:var(--xp);transition:width .5s}
+.sr-sh{display:none}
 .bump{animation:bump .45s}
 @keyframes bump{30%{transform:scale(1.5)}}
 
@@ -62,7 +64,7 @@ nav a{font-family:var(--f-pix);font-size:1rem;color:#fff;text-decoration:none;ba
 nav a:hover,nav a:focus-visible{background:var(--btn-hover)}
 
 /* panels */
-section{display:flex;flex-direction:column;gap:16px;scroll-margin-top:80px}
+section{display:flex;flex-direction:column;gap:16px;scroll-margin-top:24px}
 .panel{background:var(--panel);border:3px solid var(--edge);box-shadow:inset 3px 3px 0 var(--hi),inset -3px -3px 0 var(--lo);
   padding:18px 20px;display:flex;flex-direction:column;gap:12px;min-width:0}
 .slot{background:var(--slot);border:2px solid #373737;box-shadow:inset 3px 3px 0 var(--slot-lo),inset -3px -3px 0 #fff;padding:10px}
@@ -183,11 +185,57 @@ select{font:inherit;font-weight:700;padding:8px;border:2px solid var(--edge);bac
 table{border-collapse:collapse;width:100%;font-variant-numeric:tabular-nums;background:var(--slot)}
 th,td{border:2px solid #555;padding:8px 10px;text-align:left;vertical-align:top}
 th{font-family:var(--f-pix);font-weight:700;font-size:1.1rem;background:#e2e2e2}
-.toasts{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(16px + env(safe-area-inset-bottom,0px));z-index:20;display:flex;flex-direction:column;gap:8px;align-items:center;pointer-events:none;width:min(92vw,420px)}
+.toasts{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(90px + env(safe-area-inset-bottom,0px));z-index:20;display:flex;flex-direction:column;gap:8px;align-items:center;pointer-events:none;width:min(92vw,420px)}
 .toast{background:#212121;color:#fff;border:3px solid #000;box-shadow:inset 2px 2px 0 #4a4a4a,inset -2px -2px 0 #111;padding:10px 14px;font-family:var(--f-pix);font-size:1.1rem;display:flex;gap:10px;align-items:center;animation:pop 2.8s forwards}
 .toast .y{color:#ffe34d}
 @keyframes pop{0%{transform:translateY(20px);opacity:0}8%{transform:none;opacity:1}85%{opacity:1}100%{opacity:0}}
 @media (prefers-reduced-motion: reduce){*{animation:none!important;transition:none!important}}
+
+/* ---- iPhone 12/13/14 (390 pt) ---- */
+.grpbox{display:flex;flex-direction:column;gap:14px}
+.grpbox>summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:10px;min-height:44px}
+.grpbox>summary::-webkit-details-marker{display:none}
+.grpbox>summary::after{content:"▾";font-size:1.1rem;transition:transform .2s}
+.grpbox:not([open])>summary::after{transform:rotate(-90deg)}
+@media (max-width:600px){
+  body{font-size:17px}
+  .wrap{gap:28px}
+  .panel{padding:14px;gap:10px}
+  .slot{padding:8px}
+  nav{flex-wrap:nowrap;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;margin-inline:-16px;padding:2px 16px 6px;scroll-snap-type:x proximity}
+  nav::-webkit-scrollbar{display:none}
+  nav a{flex:none;scroll-snap-align:start;min-height:44px;display:inline-flex;align-items:center}
+  .btn,.btn.small{min-height:44px}
+  .hud-in{flex-wrap:nowrap;gap:10px;font-size:1rem}
+  .hud .res .ico svg{width:20px;height:20px}
+  .xp{min-width:56px;flex:1 1 56px;gap:6px}
+  .lvl{min-width:auto}
+  .xp .bar{min-width:52px}
+  .sr-lbl{display:none}.sr-sh{display:inline;color:#ffb347;font-weight:800}
+  .hud-in{gap:8px}
+  .hud .btn.small{min-height:40px;padding:6px 9px;font-size:.92rem}
+  .chip{flex:1 1 auto;justify-content:center}
+  input[type=range]{height:36px}
+  input[type=checkbox]{width:24px;height:24px}
+  .checks label{min-height:44px}
+  table{font-size:.92rem}
+  th,td{padding:6px 7px}
+  th{font-size:1rem}
+  .rules,.vs{grid-template-columns:1fr}
+  .stats{grid-template-columns:1fr 1fr}
+  .items{grid-template-columns:1fr 1fr}
+  .tr-in input{flex:1 1 120px;width:auto;min-width:0;font-size:1.4rem}
+  .tr-in .btn{flex:1 1 100%;justify-content:center}
+  .tr-q{font-size:1.15rem;line-height:1.45}
+  /* в тренажёре рисунок сразу под условием задачи */
+  .tr-body{display:flex;flex-direction:column;gap:12px}
+  .tr-left{display:contents}
+  .tr-left>:nth-child(1){order:1}.tr-left>:nth-child(2){order:2}.tr-left>:nth-child(3){order:3}
+  #tr-fig{order:4}
+  .tr-left>:nth-child(4){order:5}.tr-left>:nth-child(5){order:6}.tr-left>:nth-child(6){order:7}
+  .tr-left>:nth-child(7){order:8}.tr-left>:nth-child(8){order:9}
+  .ex-foot .btn{flex:1 1 100%;justify-content:center}
+}
 </style>
 
 <canvas id="bg" aria-hidden="true"></canvas>
@@ -197,7 +245,7 @@ th{font-family:var(--f-pix);font-weight:700;font-size:1.1rem;background:#e2e2e2}
     <span class="res" title="Изумруды"><span class="ico" data-ico="em24"></span><b id="h-em">0</b></span>
     <span class="res" title="Алмазы"><span class="ico" data-ico="di24"></span><b id="h-di">0</b></span>
     <div class="xp" title="Опыт: каждые 50 очков — новый уровень"><span class="lvl" id="h-lvl">Ур. 1</span><div class="bar"><i id="h-bar"></i></div></div>
-    <span class="res" title="Правильных ответов подряд">Серия <b id="h-streak">0</b></span>
+    <span class="res" title="Правильных ответов подряд"><span class="sr-lbl">Серия</span><span class="sr-sh" aria-hidden="true">×</span><b id="h-streak">0</b></span>
     <a class="btn small" href="#trener">Тренажёр</a>
   </div>
 </div>
@@ -658,12 +706,12 @@ $('#lwalk').addEventListener('click',()=>{const e=document.getElementById('lab-e
 /* ---------- примеры всех видов ---------- */
 function mulberry32(a){return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
 (function(){rnd=mulberry32(2026);let h='';
-  GROUPS.forEach(g=>{h+=`<h3 class="grp">${g.name}</h3><div class="ex-grid">`;
+  GROUPS.forEach((g,gi)=>{h+=`<details class="grpbox"${gi===0?' open':''}><summary class="grp">${g.name}</summary><div class="ex-grid">`;
     TYPES.filter(t=>t.g===g.id).forEach(t=>{const d=t.gen();
       h+=`<article class="panel"><div class="ex-head"><span class="kind">${t.name}</span>${gems(t.d)}</div><p class="cond">${d.q}</p><div class="slot figbox">${d.f}</div>
       <ol class="steps">${d.steps.map(x=>`<li>${x}</li>`).join('')}</ol><span class="ans">Ответ: ${d.ans} ${d.u}</span><p class="hint">${d.hint}</p>
       <div class="ex-foot"><span class="done-n" data-done="${t.id}"></span><button class="btn small" type="button" data-train="${t.id}">Решать такие</button></div></article>`});
-    h+='</div>'});
+    h+='</div></details>'});
   $('#examples').innerHTML=h;rnd=Math.random})();
 
 /* ---------- состояние ---------- */
