@@ -12,9 +12,7 @@
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="icon-180.png">
 <link rel="icon" href="icon-192.png">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@500;700&family=Nunito:wght@400;600;700;800&display=swap">
-<style>:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
+<style>:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;-webkit-text-size-adjust:100%;-webkit-font-smoothing:antialiased}img{max-width:100%}[hidden]{display:none!important}</style>
 </head>
 <body>
 <style>
@@ -28,8 +26,8 @@
   --fill:#b9e08c; --grid:#6f9e3c; --per:#d0261f; --line:#2a2a2a; --water:#86bdf2; --water-d:#2f6fb8; --ame:#8b2fc9; --ame-soft:#ead8f8;
   --gem:#1fae4f; --dia:#35d0e0; --gold:#f6d046; --xp:#7fe03a; --hud:#1d1d1d; --hud-ink:#f2f2f2;
   --ok:#1d7a2d; --ok-soft:#d4f2c7; --bad:#b3241e; --bad-soft:#fbdcd8;
-  --f-pix:"Pixelify Sans","Courier New",monospace;
-  --f-body:"Nunito","Segoe UI",system-ui,sans-serif;
+  --f-pix:-apple-system,BlinkMacSystemFont,"SF Pro Rounded","SF Pro Text","Helvetica Neue",Arial,sans-serif;
+  --f-body:-apple-system,BlinkMacSystemFont,"SF Pro Text","Helvetica Neue",Arial,sans-serif;
   color-scheme:light;
 }
 *{box-sizing:border-box}
@@ -38,20 +36,20 @@ body{background:var(--sky);color:var(--ink);font-family:var(--f-body);font-size:
 .page{padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:24px 120px}
 .wrap{max-width:900px;margin:0 auto;display:flex;flex-direction:column;gap:40px}
 h1,h2,h3{font-family:var(--f-pix);font-weight:700;margin:0;line-height:1.15;text-wrap:balance}
-h1{font-size:clamp(2.1rem,7vw,3.4rem);color:#fff;text-shadow:4px 4px 0 #2d2d2d}
-h2{font-size:clamp(1.6rem,5vw,2.2rem);color:#fff;text-shadow:3px 3px 0 #2d2d2d}
+h1{font-size:clamp(1.9rem,7vw,3rem);color:#fff;text-shadow:0 2px 6px rgba(0,0,0,.45);letter-spacing:-.01em}
+h2{font-size:clamp(1.45rem,5vw,2rem);color:#fff;text-shadow:0 2px 6px rgba(0,0,0,.45)}
 h3{font-size:1.35rem}
 p{margin:0}
-.sub{color:#fff;text-shadow:2px 2px 0 #2d2d2d;font-family:var(--f-pix);font-size:1.2rem}
+.sub{color:#fff;text-shadow:0 1px 4px rgba(0,0,0,.5);font-size:1.1rem;font-weight:600}
 
 /* HUD */
 .hud{position:sticky;top:env(safe-area-inset-top,0px);z-index:10;background:var(--hud);border-bottom:3px solid #000;color:var(--hud-ink);
   padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:8px}
-.hud-in{max-width:900px;margin:0 auto;display:flex;flex-wrap:wrap;align-items:center;gap:10px 18px;font-family:var(--f-pix);font-size:1.15rem}
+.hud-in{max-width:900px;margin:0 auto;display:flex;flex-wrap:wrap;align-items:center;gap:10px 18px;font-family:var(--f-pix);font-size:1.05rem;font-weight:600}
 .res{display:inline-flex;align-items:center;gap:6px;font-variant-numeric:tabular-nums}
 .res b{min-width:1.5ch}
 .xp{display:flex;align-items:center;gap:8px;flex:1 1 140px;min-width:120px}
-.lvl{color:var(--xp);text-shadow:2px 2px 0 #000;min-width:4.5ch}
+.lvl{color:var(--xp);font-weight:700;min-width:4.5ch}
 .bar{flex:1;height:12px;background:#000;border:2px solid #000;box-shadow:inset 0 0 0 2px #3a3a3a}
 .bar i{display:block;height:100%;width:0;background:var(--xp);transition:width .5s}
 .bump{animation:bump .45s}
@@ -60,7 +58,7 @@ p{margin:0}
 /* nav */
 nav{display:flex;flex-wrap:wrap;gap:8px}
 nav a{font-family:var(--f-pix);font-size:1rem;color:#fff;text-decoration:none;background:var(--btn);border:2px solid var(--edge);
-  box-shadow:inset 2px 2px 0 var(--btn-hi),inset -2px -3px 0 var(--btn-lo);padding:5px 11px;text-shadow:2px 2px 0 #3a3a3a}
+  box-shadow:inset 2px 2px 0 var(--btn-hi),inset -2px -3px 0 var(--btn-lo);padding:6px 11px;font-weight:600;text-shadow:0 1px 2px rgba(0,0,0,.5)}
 nav a:hover,nav a:focus-visible{background:var(--btn-hover)}
 
 /* panels */
@@ -107,7 +105,7 @@ svg text.n{font-size:10px;font-weight:600;fill:#4f6e2c;stroke:none}
 svg text.nm{font-size:13px;fill:var(--muted)}
 
 /* buttons */
-.btn{font-family:var(--f-pix);font-weight:500;font-size:1.05rem;color:#fff;text-shadow:2px 2px 0 #3a3a3a;background:var(--btn);border:2px solid var(--edge);
+.btn{font-family:var(--f-pix);font-weight:700;font-size:1.05rem;color:#fff;text-shadow:0 1px 2px rgba(0,0,0,.5);background:var(--btn);border:2px solid var(--edge);
   box-shadow:inset 2px 2px 0 var(--btn-hi),inset -2px -3px 0 var(--btn-lo);padding:9px 14px;cursor:pointer;display:inline-flex;align-items:center;gap:6px;text-decoration:none;line-height:1.1}
 .btn:hover:not(:disabled){background:var(--btn-hover)}
 .btn.go{background:var(--go);box-shadow:inset 2px 2px 0 var(--go-hi),inset -2px -3px 0 var(--go-lo)}
@@ -120,7 +118,7 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible{ou
 .chip.on{background:var(--btn-hover)}
 
 /* tasks / examples */
-.grp{color:#fff;text-shadow:3px 3px 0 #2d2d2d;font-size:1.6rem}
+.grp{color:#fff;text-shadow:0 2px 6px rgba(0,0,0,.45);font-size:1.45rem}
 .ex-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,330px),1fr));gap:16px}
 .kind{font-family:var(--f-pix);font-size:1.15rem;line-height:1.2}
 .ex-head{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}
@@ -157,7 +155,7 @@ select{font:inherit;font-weight:700;padding:8px;border:2px solid var(--edge);bac
 .fb.ok{color:var(--ok)}.fb.no{color:var(--bad)}
 .help{display:flex;flex-direction:column;gap:8px}
 .help>div{background:#fff8d6;border:2px solid #b89a3a;padding:10px 12px}
-.help b.t{font-family:var(--f-pix);font-weight:500;display:block;color:#7a5a00}
+.help b.t{font-family:var(--f-pix);font-weight:700;display:block;color:#7a5a00}
 .rules{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
 .rules ul{margin:0;padding-left:1.1em;display:flex;flex-direction:column;gap:4px}
 .rules li{line-height:1.4}
@@ -172,7 +170,7 @@ select{font:inherit;font-weight:700;padding:8px;border:2px solid var(--edge);bac
 .item{background:#8b8b8b;border:3px solid var(--edge);box-shadow:inset 3px 3px 0 #b0b0b0,inset -3px -3px 0 #5a5a5a;padding:12px;display:flex;flex-direction:column;align-items:center;gap:8px;color:#fff;text-align:center}
 .item .pic{width:64px;height:64px;display:grid;place-items:center;background:#6c6c6c;box-shadow:inset 3px 3px 0 #3f3f3f,inset -3px -3px 0 #a0a0a0}
 .item.locked .pic svg{filter:brightness(0) opacity(.45)}
-.item .nm{font-family:var(--f-pix);font-size:1.05rem;text-shadow:2px 2px 0 #3a3a3a}
+.item .nm{font-family:var(--f-pix);font-size:1rem;font-weight:700;text-shadow:0 1px 2px rgba(0,0,0,.5)}
 .item .pr{display:flex;gap:8px;align-items:center;font-weight:800;font-variant-numeric:tabular-nums}
 .item.own{background:#5f8f3e;box-shadow:inset 3px 3px 0 #8cc066,inset -3px -3px 0 #3c6326}
 .confirm{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
@@ -184,7 +182,7 @@ select{font:inherit;font-weight:700;padding:8px;border:2px solid var(--edge);bac
 .tw{overflow-x:auto}
 table{border-collapse:collapse;width:100%;font-variant-numeric:tabular-nums;background:var(--slot)}
 th,td{border:2px solid #555;padding:8px 10px;text-align:left;vertical-align:top}
-th{font-family:var(--f-pix);font-weight:500;font-size:1.1rem;background:#e2e2e2}
+th{font-family:var(--f-pix);font-weight:700;font-size:1.1rem;background:#e2e2e2}
 .toasts{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(16px + env(safe-area-inset-bottom,0px));z-index:20;display:flex;flex-direction:column;gap:8px;align-items:center;pointer-events:none;width:min(92vw,420px)}
 .toast{background:#212121;color:#fff;border:3px solid #000;box-shadow:inset 2px 2px 0 #4a4a4a,inset -2px -2px 0 #111;padding:10px 14px;font-family:var(--f-pix);font-size:1.1rem;display:flex;gap:10px;align-items:center;animation:pop 2.8s forwards}
 .toast .y{color:#ffe34d}
@@ -209,26 +207,12 @@ th{font-family:var(--f-pix);font-weight:500;font-size:1.1rem;background:#e2e2e2}
   <h1>Квадрат и прямоугольник</h1>
   <p class="sub">Стороны, периметр, площадь и фигуры из прямоугольников</p>
   <nav aria-label="Разделы">
-    <a href="#figury">Фигуры</a><a href="#perimetr">Периметр</a><a href="#ploshad">Площадь</a><a href="#raznica">P или S?</a><a href="#edinicy">Единицы</a><a href="#slozhnye">Сложные фигуры</a><a href="#lab">Лаборатория</a><a href="#zadachi">Все задачи</a><a href="#trener">Тренажёр</a><a href="#sunduk">Сундук</a><a href="#oshibki">Ошибки</a><a href="#shpora">Шпаргалка</a>
+    <a href="#perimetr">Периметр</a><a href="#ploshad">Площадь</a><a href="#raznica">P или S?</a><a href="#edinicy">Единицы</a><a href="#slozhnye">Сложные фигуры</a><a href="#lab">Лаборатория</a><a href="#zadachi">Все задачи</a><a href="#trener">Тренажёр</a><a href="#sunduk">Сундук</a><a href="#oshibki">Ошибки</a><a href="#shpora">Шпаргалка</a>
   </nav>
 </header>
 
-<section id="figury">
-  <h2>1. Прямоугольник и квадрат</h2>
-  <div class="row">
-    <figure class="panel figbox"><div class="slot" id="f-rect"></div><figcaption class="cap">Прямоугольник: длина <b>a</b> и ширина <b>b</b></figcaption></figure>
-    <figure class="panel figbox"><div class="slot" id="f-sq"></div><figcaption class="cap">Квадрат: все стороны одинаковые</figcaption></figure>
-  </div>
-  <div class="panel">
-    <p><b>Прямоугольник</b> — фигура с четырьмя сторонами, у которой <b>все углы прямые</b>. Прямой угол — как уголок тетрадного листа (на рисунке отмечен синим уголком).</p>
-    <p>У прямоугольника <b>противоположные стороны равны</b>: верхняя равна нижней, левая равна правой. Поэтому нужно знать всего две стороны: <b>длину</b> (<b>a</b>) и <b>ширину</b> (<b>b</b>). Равные стороны помечены одинаковыми чёрточками.</p>
-    <p><b>Квадрат</b> — это прямоугольник, у которого <b>все четыре стороны равны</b>. Поэтому у квадрата достаточно знать одну сторону.</p>
-  </div>
-  <div class="frame"><span class="tag">Запомни</span><p>Каждый квадрат — прямоугольник. Но не каждый прямоугольник — квадрат.</p></div>
-</section>
-
 <section id="perimetr">
-  <h2>2. Периметр — длина забора</h2>
+  <h2>1. Периметр — длина забора</h2>
   <div class="row">
     <figure class="panel figbox"><div class="slot" id="f-per"></div><figcaption class="cap">Обходим по краю: 6 + 4 + 6 + 4</figcaption></figure>
     <div class="panel">
@@ -244,7 +228,7 @@ th{font-family:var(--f-pix);font-weight:500;font-size:1.1rem;background:#e2e2e2}
 </section>
 
 <section id="ploshad">
-  <h2>3. Площадь — сколько клеточек внутри</h2>
+  <h2>2. Площадь — сколько клеточек внутри</h2>
   <div class="row">
     <figure class="panel figbox"><div class="slot" id="f-area"></div><figcaption class="cap">4 ряда по 6 клеточек = 24 клеточки</figcaption></figure>
     <div class="panel">
@@ -260,7 +244,7 @@ th{font-family:var(--f-pix);font-weight:500;font-size:1.1rem;background:#e2e2e2}
 </section>
 
 <section id="raznica">
-  <h2>4. Как не перепутать P и S</h2>
+  <h2>3. Как не перепутать P и S</h2>
   <div class="row">
     <figure class="panel figbox"><div class="slot" id="f-vs"></div><figcaption class="cap">Красная линия — периметр, зелёное поле — площадь</figcaption></figure>
     <div class="vs">
@@ -271,7 +255,7 @@ th{font-family:var(--f-pix);font-weight:500;font-size:1.1rem;background:#e2e2e2}
 </section>
 
 <section id="edinicy">
-  <h2>5. Единицы измерения</h2>
+  <h2>4. Единицы измерения</h2>
   <div class="row">
     <figure class="panel figbox"><div class="slot" id="f-dm"></div><figcaption class="cap">1 дм² — квадрат 10 см на 10 см. Внутри 100 квадратиков по 1 см²</figcaption></figure>
     <div class="panel">
@@ -286,7 +270,7 @@ th{font-family:var(--f-pix);font-weight:500;font-size:1.1rem;background:#e2e2e2}
 </section>
 
 <section id="slozhnye">
-  <h2>6. Сложные фигуры: разрежь или дострой</h2>
+  <h2>5. Сложные фигуры: разрежь или дострой</h2>
   <div class="row">
     <figure class="panel figbox"><div class="slot" id="f-split"></div><figcaption class="cap">Способ 1: разрезаем на два прямоугольника</figcaption></figure>
     <figure class="panel figbox"><div class="slot" id="f-add"></div><figcaption class="cap">Способ 2: достраиваем до большого и вычитаем лишнее</figcaption></figure>
@@ -299,7 +283,7 @@ th{font-family:var(--f-pix);font-weight:500;font-size:1.1rem;background:#e2e2e2}
 </section>
 
 <section id="lab">
-  <h2>7. Лаборатория: построй сам</h2>
+  <h2>6. Лаборатория: построй сам</h2>
   <div class="panel">
     <p class="hint">Двигай ползунки и смотри, как меняются периметр и площадь.</p>
     <div class="row">
@@ -317,13 +301,13 @@ th{font-family:var(--f-pix);font-weight:500;font-size:1.1rem;background:#e2e2e2}
 </section>
 
 <section id="zadachi">
-  <h2>8. Все виды задач с решениями</h2>
+  <h2>7. Все виды задач с решениями</h2>
   <div class="panel"><p>Здесь по одному примеру каждого вида. Под каждым примером есть кнопка: нажми её, и тренажёр будет давать задачи этого вида. Значками <span class="ico" data-ico="em16"></span> отмечена сложность и награда.</p></div>
   <div id="examples" style="display:flex;flex-direction:column;gap:20px"></div>
 </section>
 
 <section id="trener">
-  <h2>9. Тренажёр</h2>
+  <h2>8. Тренажёр</h2>
   <div class="panel">
     <div class="tr-top">
       <label for="tr-type">Задачи:</label>
@@ -392,7 +376,7 @@ th{font-family:var(--f-pix);font-weight:500;font-size:1.1rem;background:#e2e2e2}
 </section>
 
 <section id="sunduk">
-  <h2>10. Сундук наград</h2>
+  <h2>9. Сундук наград</h2>
   <div class="panel">
     <p>Покупай предметы за изумруды и алмазы. Чем больше решишь, тем лучше коллекция.</p>
     <div class="btns"><button class="btn small" id="trade" type="button">Обменять <span class="price"><span class="ico" data-ico="em16"></span>8</span> на <span class="price"><span class="ico" data-ico="di16"></span>1</span></button></div>
@@ -401,7 +385,7 @@ th{font-family:var(--f-pix);font-weight:500;font-size:1.1rem;background:#e2e2e2}
 </section>
 
 <section id="oshibki">
-  <h2>11. Частые ошибки</h2>
+  <h2>10. Частые ошибки</h2>
   <div class="panel mist">
     <div><span class="x">✗</span><p>Сложили длину и ширину и забыли умножить на 2. <b>6 + 4 = 10</b> — это только половина периметра!</p></div>
     <div><span class="x">✗</span><p>Для площади сложили стороны вместо умножения. Площадь — всегда <b>a · b</b>.</p></div>
@@ -414,7 +398,7 @@ th{font-family:var(--f-pix);font-weight:500;font-size:1.1rem;background:#e2e2e2}
 </section>
 
 <section id="shpora">
-  <h2>12. Шпаргалка</h2>
+  <h2>11. Шпаргалка</h2>
   <div class="panel tw">
     <table>
       <tr><th>Что ищем</th><th>Прямоугольник</th><th>Квадрат</th></tr>
@@ -650,8 +634,6 @@ const TYPES=[
 ];
 
 /* ---------- теория: рисунки ---------- */
-$('#f-rect').innerHTML=rect({w:7,h:4,cell:32,angles:true,ticks:'rect',top:'a',bottom:'a',left:'b',right:'b',aria:'Прямоугольник с равными противоположными сторонами'});
-$('#f-sq').innerHTML=rect({w:5,h:5,cell:32,angles:true,ticks:'sq',top:'a',bottom:'a',left:'a',right:'a',aria:'Квадрат'});
 $('#f-per').innerHTML=rect({w:6,h:4,cell:34,perim:true,top:'6 см',bottom:'6 см',left:'4 см',right:'4 см',center:'P = 20 см'});
 $('#f-area').innerHTML=rect({w:6,h:4,cell:34,area:true,nums:true,top:'6 см',left:'4 см'});
 $('#f-vs').innerHTML=rect({w:7,h:4,cell:32,area:true,perim:true,top:'7 м',left:'4 м',center:['S = 28 м²','P = 22 м']});
