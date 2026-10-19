@@ -236,31 +236,270 @@ th{font-family:var(--f-pix);font-weight:700;font-size:1.1rem;background:#e2e2e2}
   .tr-left>:nth-child(7){order:8}.tr-left>:nth-child(8){order:9}
   .ex-foot .btn{flex:1 1 100%;justify-content:center}
 }
-</style>
 
+/* ================= v2: экраны, вкладки, поход, верстак ================= */
+html,body{height:100%}
+body{overscroll-behavior-y:none}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:30;background:#6f9df5}
+.screen{padding-left:max(14px,env(safe-area-inset-left,0px));padding-right:max(14px,env(safe-area-inset-right,0px));
+  padding-top:14px;padding-bottom:calc(96px + env(safe-area-inset-bottom,0px));max-width:720px;margin:0 auto;display:flex;flex-direction:column;gap:16px}
+.topbar{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.topbar h1{font-size:1.75rem;color:#fff;text-shadow:0 2px 6px rgba(0,0,0,.45)}
+.topbar .kicker{color:#fff;font-weight:700;font-size:.9rem;text-shadow:0 1px 3px rgba(0,0,0,.5);opacity:.95}
+.wallet{display:flex;gap:6px;flex:none}
+.coin{display:inline-flex;align-items:center;gap:5px;background:rgba(20,20,20,.78);color:#fff;font-weight:800;padding:5px 9px;border:2px solid #000;font-variant-numeric:tabular-nums;font-size:1rem}
+.coin svg{width:18px;height:18px}
+.coin.bump{animation:bump .45s}
+.panel h3{font-size:1.15rem}
+.btn.big{font-size:1.3rem;padding:16px;justify-content:center;width:100%;min-height:58px}
+.btn.wide{width:100%;justify-content:center}
+.btn,.btn.small{min-height:44px}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.muted{color:var(--muted);font-size:.95rem}
+
+/* вкладки */
+.tabs{position:fixed;left:0;right:0;bottom:0;z-index:25;background:#1d1d1d;border-top:3px solid #000;display:grid;grid-template-columns:repeat(5,1fr);
+  padding-left:env(safe-area-inset-left,0px);padding-right:env(safe-area-inset-right,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+.tab{all:unset;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;padding:8px 0 7px;color:#bdbdbd;font-weight:700;font-size:.68rem;letter-spacing:-.01em;white-space:nowrap;min-width:0;-webkit-tap-highlight-color:transparent;position:relative}
+.tab svg{width:26px;height:26px;opacity:.7}
+.tab.on{color:#fff}
+.tab.on svg{opacity:1}
+.tab.on::before{content:"";position:absolute;top:0;left:22%;right:22%;height:3px;background:var(--xp)}
+.tab:focus-visible{outline:3px solid var(--gold);outline-offset:-3px}
+.tab .dot{position:absolute;top:6px;right:calc(50% - 20px);width:9px;height:9px;background:#ff4d3d;border:2px solid #1d1d1d;border-radius:50%}
+
+/* главная */
+.lvlhead{display:flex;align-items:center;gap:14px}
+.lvlbadge{width:64px;height:64px;flex:none;display:grid;place-items:center;background:#2b2b2b;border:3px solid #000;box-shadow:inset 3px 3px 0 #555,inset -3px -3px 0 #111;color:var(--xp);font-weight:900;font-size:1.8rem}
+.goal{font-weight:700}
+.quest{display:grid;grid-template-columns:1fr auto;gap:4px 10px;align-items:center;padding:8px 0;border-bottom:2px dashed #a7a7a7}
+.quest:last-of-type{border-bottom:0}
+.quest .qt{font-weight:700}
+.quest .qn{font-weight:800;font-variant-numeric:tabular-nums}
+.quest.done .qt{color:var(--ok)}
+.qbar{grid-column:1/-1;height:10px;background:#8e8e8e;border:2px solid #333}
+.qbar i{display:block;height:100%;background:var(--go);width:0;transition:width .5s}
+.week{display:grid;grid-template-columns:repeat(7,1fr);gap:6px}
+.day{display:flex;flex-direction:column;align-items:center;gap:4px;font-size:.78rem;font-weight:700;color:var(--muted)}
+.day b{width:100%;aspect-ratio:1;max-width:44px;display:grid;place-items:center;background:#e2e2e2;border:2px solid #555}
+.day.on b{background:var(--go);border-color:#245a18;color:#fff}
+.day.today b{outline:3px solid var(--gold);outline-offset:1px}
+.inv{display:grid;grid-template-columns:repeat(auto-fill,minmax(64px,1fr));gap:8px}
+.slotc{position:relative;background:#8b8b8b;border:2px solid #373737;box-shadow:inset 3px 3px 0 #5a5a5a,inset -3px -3px 0 #b0b0b0;aspect-ratio:1;display:grid;place-items:center}
+.slotc svg{width:60%;height:60%}
+.slotc .n{position:absolute;right:4px;bottom:1px;color:#fff;font-weight:900;font-size:.95rem;text-shadow:1px 1px 0 #000,-1px -1px 0 #000,1px -1px 0 #000,-1px 1px 0 #000}
+.slotc.zero svg{filter:grayscale(1) opacity(.35)}
+.slotc .nm{position:absolute;left:0;right:0;top:100%;text-align:center;font-size:.7rem;font-weight:700;color:var(--muted)}
+.invwrap .inv{row-gap:22px}
+
+/* поход */
+.cells{display:grid;grid-template-columns:repeat(10,1fr);gap:4px}
+.cell{aspect-ratio:1;border:2px solid #333;background:#e2e2e2}
+.cell.ok{background:var(--go);box-shadow:inset 0 4px 0 #83cf5c}
+.cell.bad{background:#b3241e;box-shadow:inset 0 4px 0 #e0645e}
+.cell.now{outline:3px solid var(--gold);outline-offset:1px}
+.freebar{display:flex;flex-direction:column;gap:8px;background:#fff8d6;border:2px solid #b89a3a;padding:10px 12px}
+.taskcard{gap:12px}
+.ansrow{display:flex;gap:10px;align-items:center}
+.ansrow input{flex:1 1 auto;min-width:0;font:inherit;font-weight:800;font-size:1.5rem;padding:10px 12px;border:3px solid var(--edge);background:var(--slot);color:var(--ink);box-shadow:inset 2px 2px 0 var(--slot-lo)}
+.ansrow input.ok{border-color:var(--ok);background:var(--ok-soft)}
+.ansrow input.bad{border-color:var(--bad);background:var(--bad-soft)}
+.shake{animation:shake .45s}
+@keyframes shake{20%{transform:translateX(-8px)}40%{transform:translateX(7px)}60%{transform:translateX(-5px)}80%{transform:translateX(3px)}}
+.helpbtns{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.helpbtns .btn{justify-content:center;font-size:.95rem;padding:8px 6px}
+.sumbig{font-size:3.4rem;font-weight:900;line-height:1;font-variant-numeric:tabular-nums}
+.sum{align-items:center;text-align:center}
+.loot{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
+.loot span{display:inline-flex;align-items:center;gap:4px;background:#e2e2e2;border:2px solid #555;padding:4px 8px;font-weight:800}
+.loot svg{width:20px;height:20px}
+.typical{background:#ffe9c7;border:2px solid #c98a1a;padding:8px 10px;font-weight:700}
+
+/* звания и грамота */
+.rkpath{display:flex;flex-wrap:wrap;gap:5px}
+.rk{font-size:.78rem;font-weight:800;padding:3px 7px;border:2px solid #555;background:#e2e2e2;color:#777}
+.rk.on{background:#2b2b2b;color:var(--rc);border-color:#000}
+.lvlbadge{border-width:4px}
+.cert{width:100%;background:#fff8d6;border:4px double #b89a3a;padding:12px 10px;display:flex;flex-direction:column;gap:4px;align-items:center}
+.cert-t{font-size:1.6rem;font-weight:900;letter-spacing:.2em;color:#7a5a00}
+.cert-th{font-size:1.1rem;font-weight:800}
+.cert .bigicon svg{width:56px;height:56px}
+.cert .loot span{font-size:.85rem;padding:2px 6px}
+.ov-in{max-height:calc(100vh - 40px);overflow:auto}
+.ov:not([hidden])~.toasts{visibility:hidden}
+
+/* верстак */
+.seg{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.seg .btn{justify-content:center;font-size:.95rem;padding:8px 4px}
+.seg .btn.on{background:var(--btn-hover)}
+.recipes{display:flex;flex-direction:column;gap:10px}
+.rcp{display:grid;grid-template-columns:56px 1fr;gap:10px;align-items:center;background:#e2e2e2;border:2px solid var(--edge);padding:10px}
+.rcp .pic{width:56px;height:56px;display:grid;place-items:center;background:#8b8b8b;box-shadow:inset 3px 3px 0 #5a5a5a,inset -3px -3px 0 #b0b0b0}
+.rcp .pic svg{width:40px;height:40px}
+.rcp .nm{font-weight:800;font-size:1.05rem}
+.rcp .eff{font-size:.88rem;color:var(--muted);font-weight:600}
+.rcp .need{display:flex;flex-wrap:wrap;gap:6px;margin-top:4px}
+.rcp .need span{display:inline-flex;align-items:center;gap:3px;font-weight:800;font-size:.9rem;background:#fff;border:2px solid #777;padding:1px 6px}
+.rcp .need span.lack{border-color:var(--bad);color:var(--bad)}
+.rcp .need svg{width:16px;height:16px}
+.rcp .act{grid-column:1/-1;display:flex;gap:8px}
+.rcp .act .btn{flex:1;justify-content:center}
+.rcp.locked{opacity:.6}
+.rcp.locked .pic svg{filter:brightness(0) opacity(.45)}
+.rcp.own{background:#d4f2c7}
+.shop{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.shopi{display:flex;flex-direction:column;align-items:center;gap:6px;background:#e2e2e2;border:2px solid var(--edge);padding:10px;text-align:center}
+.shopi svg{width:36px;height:36px}
+.shopi .btn{width:100%;justify-content:center}
+
+/* теория */
+.tiles{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.tile{all:unset;cursor:pointer;background:var(--panel);border:3px solid var(--edge);box-shadow:inset 3px 3px 0 var(--hi),inset -3px -3px 0 var(--lo);padding:14px 12px;display:flex;flex-direction:column;gap:6px;min-height:86px}
+.tile b{font-size:1.08rem}
+.tile span{font-size:.85rem;color:var(--muted);font-weight:600}
+.tile .new{color:var(--ok);font-weight:800}
+.tile:focus-visible{outline:3px solid var(--gold)}
+.th{display:flex;flex-direction:column;gap:14px}
+.th h2{font-size:1.5rem}
+.thback{align-self:flex-start}
+
+/* успехи */
+.achs{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.ach{display:flex;gap:10px;align-items:center;background:#e2e2e2;border:2px solid var(--edge);padding:8px}
+.ach svg{width:34px;height:34px;flex:none}
+.ach b{display:block;font-size:.92rem;line-height:1.2}
+.ach span{font-size:.78rem;color:var(--muted);font-weight:600;line-height:1.2;display:block}
+.ach.locked svg{filter:brightness(0) opacity(.35)}
+.ach.locked b{color:#666}
+.toggle{display:flex;align-items:center;justify-content:space-between;gap:10px;font-weight:700;min-height:44px}
+.toggle input{width:26px;height:26px;accent-color:var(--go)}
+
+/* шторка «Правило» */
+.sheet{position:fixed;inset:0;z-index:40;background:rgba(0,0,0,.5);display:flex;align-items:flex-end}
+.sheet-in{background:var(--sky);width:100%;max-height:88vh;overflow:auto;-webkit-overflow-scrolling:touch;border-top:4px solid #000;
+  padding:14px max(14px,env(safe-area-inset-left,0px)) calc(20px + env(safe-area-inset-bottom,0px));display:flex;flex-direction:column;gap:12px;animation:up .25s ease-out}
+@keyframes up{from{transform:translateY(40px);opacity:.5}}
+
+/* оверлей уровня */
+.ov{position:fixed;inset:0;z-index:50;background:rgba(10,14,30,.82);display:grid;place-items:center;padding:20px}
+.ov-in{background:var(--panel);border:4px solid #000;box-shadow:inset 4px 4px 0 #fff,inset -4px -4px 0 #555;max-width:380px;width:100%;padding:22px 18px;display:flex;flex-direction:column;gap:12px;align-items:center;text-align:center;animation:pop2 .5s cubic-bezier(.2,1.6,.4,1)}
+.ov-in .bigicon svg{width:96px;height:96px}
+.ov-in h2{color:var(--ink);text-shadow:none;font-size:2rem}
+@keyframes pop2{from{transform:scale(.4);opacity:0}}
+#fx{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:60}
+.fly{position:fixed;z-index:61;pointer-events:none;transition:transform .7s cubic-bezier(.5,-0.3,.6,1),opacity .7s}
+.fly svg{width:26px;height:26px}
+.plus{position:fixed;z-index:61;pointer-events:none;font-weight:900;font-size:1.4rem;color:#fff;text-shadow:0 2px 0 #000,0 0 6px #000;animation:plus 1s ease-out forwards}
+@keyframes plus{to{transform:translateY(-60px);opacity:0}}
+.toasts{bottom:calc(84px + env(safe-area-inset-bottom,0px));z-index:70}
+@media (prefers-reduced-motion:reduce){.fly{transition:none}}
+</style>
 <canvas id="bg" aria-hidden="true"></canvas>
 
-<div class="hud" id="hud">
-  <div class="hud-in">
-    <span class="res" title="Изумруды"><span class="ico" data-ico="em24"></span><b id="h-em">0</b></span>
-    <span class="res" title="Алмазы"><span class="ico" data-ico="di24"></span><b id="h-di">0</b></span>
-    <div class="xp" title="Опыт: каждые 50 очков — новый уровень"><span class="lvl" id="h-lvl">Ур. 1</span><div class="bar"><i id="h-bar"></i></div></div>
-    <span class="res" title="Правильных ответов подряд"><span class="sr-lbl">Серия</span><span class="sr-sh" aria-hidden="true">×</span><b id="h-streak">0</b></span>
-    <a class="btn small" href="#trener">Тренажёр</a>
+<!-- ============ ГЛАВНАЯ ============ -->
+<section class="screen" id="s-home">
+  <div class="topbar"><div><p class="kicker">Квадрат и прямоугольник</p><h1>Привет, строитель!</h1></div><div class="wallet"></div></div>
+
+  <div class="panel">
+    <div class="lvlhead"><div class="lvlbadge" id="hm-lvl">1</div>
+      <div><h3>Уровень <span id="hm-lvl2">1</span> · <span id="hm-rank"></span></h3><p class="goal" id="hm-goal"></p></div></div>
+    <div class="rkpath" id="hm-path"></div><p class="muted" id="hm-next"></p>
+    <button class="btn wide" id="hm-cert" type="button" hidden>Моя грамота Мастера</button>
+    <p class="muted" id="hm-last"></p>
+    <button class="btn go big" id="hm-go" type="button">В поход!</button>
+    <button class="btn wide" id="hm-free" type="button">Свободная тренировка</button>
   </div>
-</div>
 
-<div class="page"><div class="wrap">
-<header style="display:flex;flex-direction:column;gap:14px">
-  <h1>Квадрат и прямоугольник</h1>
-  <p class="sub">Стороны, периметр, площадь и фигуры из прямоугольников</p>
-  <nav aria-label="Разделы">
-    <a href="#perimetr">Периметр</a><a href="#ploshad">Площадь</a><a href="#raznica">P или S?</a><a href="#edinicy">Единицы</a><a href="#slozhnye">Сложные фигуры</a><a href="#lab">Лаборатория</a><a href="#zadachi">Все задачи</a><a href="#trener">Тренажёр</a><a href="#sunduk">Сундук</a><a href="#oshibki">Ошибки</a><a href="#shpora">Шпаргалка</a>
-  </nav>
-</header>
+  <div class="panel">
+    <h3>Задания на сегодня</h3>
+    <div id="quests"></div>
+    <button class="btn go wide" id="q-claim" type="button" hidden>Открыть сундук!</button>
+    <p class="muted" id="q-note"></p>
+  </div>
 
-<section id="perimetr">
-  <h2>1. Периметр — длина забора</h2>
+  <div class="panel">
+    <h3>Дней подряд: <span id="days-n">0</span></h3>
+    <div class="week" id="week"></div>
+    <p class="muted" id="days-next"></p>
+  </div>
+
+  <div class="panel invwrap">
+    <h3>Мои ресурсы</h3>
+    <div class="inv" id="hm-inv"></div>
+    <button class="btn wide" id="hm-craft" type="button" style="margin-top:14px">На верстак →</button>
+  </div>
+</section>
+
+<!-- ============ ПОХОД / ТРЕНИРОВКА ============ -->
+<section class="screen" id="s-play" hidden>
+  <div class="topbar"><h1 id="p-title">Поход</h1><div class="wallet"></div></div>
+
+  <!-- старт -->
+  <div id="p-start" class="panel">
+    <div id="p-intro"></div>
+    <p class="muted">Задача засчитана, если решена с первой или второй попытки и без открытого решения. За верные ответы — изумруды и ресурсы.</p>
+    <button class="btn go big" id="p-go" type="button">Начать поход</button>
+    <div class="freebar">
+      <b>Свободная тренировка</b>
+      <span class="muted">Без наград и ограничений: можно потренировать одну тему. Подсказки бесплатные.</span>
+      <select id="fr-type" aria-label="Вид задач"></select>
+      <button class="btn wide" id="fr-go" type="button">Тренироваться</button>
+    </div>
+  </div>
+
+  <!-- задача -->
+  <div id="p-task" hidden>
+    <div id="p-head" style="display:flex;flex-direction:column;gap:8px;margin-bottom:12px"></div>
+    <div class="panel taskcard">
+      <div class="badges"><span class="badge" id="t-group"></span><span class="badge" id="t-reward"></span></div>
+      <p class="kind" id="t-name"></p>
+      <p class="tr-q" id="t-q"></p>
+      <div class="slot figbox" id="t-fig"></div>
+      <div class="ansrow"><input id="t-a" type="text" inputmode="numeric" autocomplete="off" aria-label="Ответ"><span class="unit" id="t-u"></span></div>
+      <button class="btn go big" id="t-check" type="button">Проверить</button>
+      <p class="fb" id="t-fb" aria-live="polite"></p>
+      <div class="help" id="t-help"></div>
+      <div class="helpbtns" id="t-btns">
+        <button class="btn" id="t-rule" type="button">Правило</button>
+        <button class="btn" id="t-hint" type="button">Подсказка</button>
+        <button class="btn" id="t-step" type="button">Первый шаг</button>
+        <button class="btn" id="t-sol" type="button">Решение</button>
+      </div>
+      <button class="btn go big" id="t-next" type="button" hidden>Дальше →</button>
+    </div>
+    <button class="btn wide" id="t-leave" type="button" style="margin-top:12px"></button>
+  </div>
+
+  <!-- итоги -->
+  <div id="p-sum" class="panel sum" hidden></div>
+</section>
+
+<!-- ============ ВЕРСТАК ============ -->
+<section class="screen" id="s-craft" hidden>
+  <div class="topbar"><h1>Верстак</h1><div class="wallet"></div></div>
+  <div class="seg" role="tablist">
+    <button class="btn on" data-seg="rcp" type="button">Рецепты</button>
+    <button class="btn" data-seg="shop" type="button">Магазин</button>
+    <button class="btn" data-seg="inv" type="button">Инвентарь</button>
+  </div>
+  <div id="c-rcp" class="recipes"></div>
+  <div id="c-shop" hidden>
+    <div class="panel"><p>Не хватает ресурса для рецепта? Купи его за изумруды.</p><div class="shop" id="shop"></div></div>
+  </div>
+  <div id="c-inv" hidden>
+    <div class="panel invwrap"><h3>Ресурсы</h3><div class="inv" id="inv-res"></div></div>
+    <div class="panel invwrap"><h3>Инструменты и вещи</h3><div class="inv" id="inv-tools"></div><p class="muted" id="inv-eff"></p></div>
+  </div>
+</section>
+
+<!-- ============ ТЕОРИЯ ============ -->
+<section class="screen" id="s-theory" hidden>
+  <div class="topbar"><h1>Правила</h1><div class="wallet"></div></div>
+  <div id="th-grid" class="tiles"></div>
+  <div id="th-view" hidden><button class="btn thback" id="th-back" type="button">← Все правила</button><div id="th-slot" style="margin-top:12px"></div></div>
+  <div id="th-store" hidden>
+<div class="th" data-k="perimetr" hidden>
+  <h2>Периметр — длина забора</h2>
   <div class="row">
     <figure class="panel figbox"><div class="slot" id="f-per"></div><figcaption class="cap">Обходим по краю: 6 + 4 + 6 + 4</figcaption></figure>
     <div class="panel">
@@ -273,10 +512,9 @@ th{font-family:var(--f-pix);font-weight:700;font-size:1.1rem;background:#e2e2e2}
   <div class="frame"><span class="tag">Формулы периметра</span>
     <p class="formula"><span class="per">P</span> прямоугольника = (a + b) · 2</p>
     <p class="formula"><span class="per">P</span> квадрата = a · 4</p></div>
-</section>
-
-<section id="ploshad">
-  <h2>2. Площадь — сколько клеточек внутри</h2>
+</div>
+<div class="th" data-k="ploshad" hidden>
+  <h2>Площадь — сколько клеточек внутри</h2>
   <div class="row">
     <figure class="panel figbox"><div class="slot" id="f-area"></div><figcaption class="cap">4 ряда по 6 клеточек = 24 клеточки</figcaption></figure>
     <div class="panel">
@@ -289,10 +527,9 @@ th{font-family:var(--f-pix);font-weight:700;font-size:1.1rem;background:#e2e2e2}
     <p class="formula"><span class="area">S</span> прямоугольника = a · b</p>
     <p class="formula"><span class="area">S</span> квадрата = a · a</p>
     <p class="hint">Площадь — это <b>умножение</b> длины на ширину, а не сложение.</p></div>
-</section>
-
-<section id="raznica">
-  <h2>3. Как не перепутать P и S</h2>
+</div>
+<div class="th" data-k="raznica" hidden>
+  <h2>Как не перепутать P и S</h2>
   <div class="row">
     <figure class="panel figbox"><div class="slot" id="f-vs"></div><figcaption class="cap">Красная линия — периметр, зелёное поле — площадь</figcaption></figure>
     <div class="vs">
@@ -300,10 +537,9 @@ th{font-family:var(--f-pix);font-weight:700;font-size:1.1rem;background:#e2e2e2}
       <div class="s"><b>Площадь S</b><span>Газон, пол, плитка, покрасить, застелить.</span><span>Умножаем длину на ширину.</span><span>Ответ в <b>см², дм², м²</b>.</span></div>
     </div>
   </div>
-</section>
-
-<section id="edinicy">
-  <h2>4. Единицы измерения</h2>
+</div>
+<div class="th" data-k="edinicy" hidden>
+  <h2>Единицы измерения</h2>
   <div class="row">
     <figure class="panel figbox"><div class="slot" id="f-dm"></div><figcaption class="cap">1 дм² — квадрат 10 см на 10 см. Внутри 100 квадратиков по 1 см²</figcaption></figure>
     <div class="panel">
@@ -315,10 +551,9 @@ th{font-family:var(--f-pix);font-weight:700;font-size:1.1rem;background:#e2e2e2}
       <p class="hint"><b>Важно:</b> перед решением все стороны переводим в одинаковые единицы.</p>
     </div>
   </div>
-</section>
-
-<section id="slozhnye">
-  <h2>5. Сложные фигуры: разрежь или дострой</h2>
+</div>
+<div class="th" data-k="slozhnye" hidden>
+  <h2>Сложные фигуры: разрежь или дострой</h2>
   <div class="row">
     <figure class="panel figbox"><div class="slot" id="f-split"></div><figcaption class="cap">Способ 1: разрезаем на два прямоугольника</figcaption></figure>
     <figure class="panel figbox"><div class="slot" id="f-add"></div><figcaption class="cap">Способ 2: достраиваем до большого и вычитаем лишнее</figcaption></figure>
@@ -328,10 +563,9 @@ th{font-family:var(--f-pix);font-weight:700;font-size:1.1rem;background:#e2e2e2}
     <p><b>Достроить:</b> дорисовываем фигуру до большого прямоугольника, находим его площадь и вычитаем добавленный кусок. 6 · 5 = 30, 30 − 9 = <b>21 см²</b>.</p>
     <p><b>Периметр</b> сложной фигуры — обходим по краю и складываем <b>все</b> стороны. Пунктир внутри в периметр не входит.</p>
   </div>
-</section>
-
-<section id="lab">
-  <h2>6. Лаборатория: построй сам</h2>
+</div>
+<div class="th" data-k="lab" hidden>
+  <h2>Лаборатория: построй сам</h2>
   <div class="panel">
     <p class="hint">Двигай ползунки и смотри, как меняются периметр и площадь.</p>
     <div class="row">
@@ -346,94 +580,14 @@ th{font-family:var(--f-pix);font-weight:700;font-size:1.1rem;background:#e2e2e2}
       <div class="slot figbox" id="lfig"></div>
     </div>
   </div>
-</section>
-
-<section id="zadachi">
-  <h2>7. Все виды задач с решениями</h2>
+</div>
+<div class="th" data-k="zadachi" hidden>
+  <h2>Все виды задач с решениями</h2>
   <div class="panel"><p>Здесь по одному примеру каждого вида. Под каждым примером есть кнопка: нажми её, и тренажёр будет давать задачи этого вида. Значками <span class="ico" data-ico="em16"></span> отмечена сложность и награда.</p></div>
   <div id="examples" style="display:flex;flex-direction:column;gap:20px"></div>
-</section>
-
-<section id="trener">
-  <h2>8. Тренажёр</h2>
-  <div class="panel">
-    <div class="tr-top">
-      <label for="tr-type">Задачи:</label>
-      <select id="tr-type"></select>
-    </div>
-    <div class="btns" role="group" aria-label="Сложность">
-      <button class="btn small chip on" data-d="0" type="button">Любые</button>
-      <button class="btn small chip" data-d="1" type="button">Лёгкие <span class="gems" data-gems="1"></span></button>
-      <button class="btn small chip" data-d="2" type="button">Средние <span class="gems" data-gems="2"></span></button>
-      <button class="btn small chip" data-d="3" type="button">Сложные <span class="gems" data-gems="3"></span></button>
-    </div>
-    <div class="tr-body">
-      <div class="tr-left">
-        <div class="badges"><span class="badge" id="tr-group"></span><span class="badge" id="tr-reward"></span></div>
-        <p class="kind" id="tr-name"></p>
-        <p class="tr-q" id="tr-q"></p>
-        <div class="tr-in">
-          <input id="tr-a" type="text" inputmode="numeric" autocomplete="off" aria-label="Ответ">
-          <span class="unit" id="tr-u"></span>
-          <button class="btn go" id="tr-check" type="button">Проверить</button>
-        </div>
-        <p class="fb" id="tr-fb" aria-live="polite"></p>
-        <div class="btns">
-          <button class="btn small" id="buy-hint" type="button">Подсказка <span class="price"><span class="ico" data-ico="em16"></span>1</span></button>
-          <button class="btn small" id="buy-step" type="button">Первый шаг <span class="price"><span class="ico" data-ico="em16"></span>2</span></button>
-          <button class="btn small" id="buy-sol" type="button">Всё решение <span class="price"><span class="ico" data-ico="em16"></span>3</span></button>
-        </div>
-        <div class="help" id="tr-help"></div>
-        <div class="btns"><button class="btn" id="tr-next" type="button">Следующая задача →</button></div>
-      </div>
-      <div class="slot figbox" id="tr-fig"></div>
-    </div>
-  </div>
-  <div class="panel">
-    <h3>Как играть</h3>
-    <div class="rules">
-      <div><b>Зарабатывай</b><ul>
-        <li>Лёгкая задача: <span class="gems" data-gems="1"></span> +1 изумруд</li>
-        <li>Средняя: <span class="gems" data-gems="2"></span> +2 изумруда</li>
-        <li>Сложная: <span class="gems" data-gems="3"></span> +3 изумруда</li>
-        <li>Если ответил со второй попытки, изумрудов на 1 меньше.</li>
-      </ul></div>
-      <div><b>Бонусы</b><ul>
-        <li>5 верных ответов подряд — <span class="ico" data-ico="di16"></span> алмаз.</li>
-        <li>Новый уровень — ещё <span class="ico" data-ico="di16"></span> алмаз.</li>
-        <li>Опыт: лёгкая +10, средняя +20, сложная +30. Уровень — каждые 50.</li>
-      </ul></div>
-      <div><b>Трать</b><ul>
-        <li>Подсказка — 1 изумруд.</li>
-        <li>Первый шаг решения — 2.</li>
-        <li>Всё решение — 3, но за эту задачу награды уже не будет.</li>
-        <li>Копи на предметы в сундуке.</li>
-      </ul></div>
-    </div>
-  </div>
-  <div class="panel">
-    <h3>Мои успехи</h3>
-    <div class="stats">
-      <div class="stat"><b id="st-right">0</b><span>верно с первой попытки</span></div>
-      <div class="stat"><b id="st-total">0</b><span>всего задач</span></div>
-      <div class="stat"><b id="st-best">0</b><span>лучшая серия</span></div>
-      <div class="stat"><b id="st-types">0</b><span>видов задач освоено</span></div>
-    </div>
-    <div class="confirm" id="reset-box"><button class="btn small" id="reset" type="button">Начать заново</button></div>
-  </div>
-</section>
-
-<section id="sunduk">
-  <h2>9. Сундук наград</h2>
-  <div class="panel">
-    <p>Покупай предметы за изумруды и алмазы. Чем больше решишь, тем лучше коллекция.</p>
-    <div class="btns"><button class="btn small" id="trade" type="button">Обменять <span class="price"><span class="ico" data-ico="em16"></span>8</span> на <span class="price"><span class="ico" data-ico="di16"></span>1</span></button></div>
-    <div class="items" id="items"></div>
-  </div>
-</section>
-
-<section id="oshibki">
-  <h2>10. Частые ошибки</h2>
+</div>
+<div class="th" data-k="oshibki" hidden>
+  <h2>Частые ошибки</h2>
   <div class="panel mist">
     <div><span class="x">✗</span><p>Сложили длину и ширину и забыли умножить на 2. <b>6 + 4 = 10</b> — это только половина периметра!</p></div>
     <div><span class="x">✗</span><p>Для площади сложили стороны вместо умножения. Площадь — всегда <b>a · b</b>.</p></div>
@@ -443,10 +597,9 @@ th{font-family:var(--f-pix);font-weight:700;font-size:1.1rem;background:#e2e2e2}
     <div><span class="x">✗</span><p>Нашли ширину по периметру как <b>P − a</b>. Правильно: <b>P : 2 − a</b>.</p></div>
     <div><span class="x">✗</span><p>В периметр сложной фигуры добавили пунктирную линию разреза. Считаем только внешние стороны.</p></div>
   </div>
-</section>
-
-<section id="shpora">
-  <h2>11. Шпаргалка</h2>
+</div>
+<div class="th" data-k="shpora" hidden>
+  <h2>Шпаргалка</h2>
   <div class="panel tw">
     <table>
       <tr><th>Что ищем</th><th>Прямоугольник</th><th>Квадрат</th></tr>
@@ -460,8 +613,50 @@ th{font-family:var(--f-pix);font-weight:700;font-size:1.1rem;background:#e2e2e2}
       <tr><td>Сложная фигура, P</td><td colspan="2">сложить все внешние стороны</td></tr>
     </table>
   </div>
+</div>
+
+  </div>
 </section>
-</div></div>
+
+<!-- ============ УСПЕХИ ============ -->
+<section class="screen" id="s-stats" hidden>
+  <div class="topbar"><h1>Успехи</h1><div class="wallet"></div></div>
+  <div class="panel">
+    <div class="stats">
+      <div class="stat"><b id="st-level">1</b><span>уровень</span></div>
+      <div class="stat"><b id="st-hikes">0</b><span>походов</span></div>
+      <div class="stat"><b id="st-right">0</b><span>верно в походах</span></div>
+      <div class="stat"><b id="st-best">0</b><span>лучшая серия</span></div>
+      <div class="stat"><b id="st-clean">0</b><span>чистых походов</span></div>
+      <div class="stat"><b id="st-types">0</b><span>видов задач освоено</span></div>
+    </div>
+  </div>
+  <div class="panel"><h3>Достижения</h3><div class="achs" id="achs"></div></div>
+  <div class="panel">
+    <h3>Как играть</h3>
+    <div class="rules">
+      <div><b>Поход</b><ul><li>10 задач всех видов.</li><li>8 верных — новый уровень и алмаз.</li><li>Звания: Новичок, Шахтёр, Кузнец, Строитель, Архитектор, Мастер (10 уровень).</li><li>Мастер раз в 3 дня проходит повторение из 5 задач.</li><li>10 из 10 — бонус за чистый поход.</li><li>Ошибся дважды — задача не засчитана, но покажем решение.</li></ul></div>
+      <div><b>Награды</b><ul><li>Лёгкая задача: 1 изумруд и дерево или камень.</li><li>Средняя: 2 изумруда и железо или уголь.</li><li>Сложная: 3 изумруда и золото или алмаз.</li><li>Со второй попытки изумрудов на 1 меньше.</li></ul></div>
+      <div><b>Верстак</b><ul><li>Собирай инструменты из ресурсов.</li><li>Кирки дают больше ресурсов, мечи — больше изумрудов.</li><li>Факел — бесплатная подсказка.</li><li>Новые рецепты открываются с уровнем.</li></ul></div>
+    </div>
+  </div>
+  <div class="panel">
+    <label class="toggle">Звуки<input type="checkbox" id="snd"></label>
+    <div class="confirm" id="reset-box"><button class="btn small" id="reset" type="button">Начать заново</button></div>
+  </div>
+</section>
+
+<nav class="tabs" id="tabs" aria-label="Разделы">
+  <button class="tab on" data-tab="home" type="button"><span data-pix="house"></span>Главная</button>
+  <button class="tab" data-tab="play" type="button"><span data-pix="sword"></span>Поход</button>
+  <button class="tab" data-tab="craft" type="button"><span data-pix="pick"></span>Верстак</button>
+  <button class="tab" data-tab="theory" type="button"><span data-pix="book"></span>Правила</button>
+  <button class="tab" data-tab="stats" type="button"><span data-pix="cup"></span>Успехи</button>
+</nav>
+
+<div class="sheet" id="sheet" hidden><div class="sheet-in"><button class="btn thback" id="sheet-close" type="button">← Вернуться к задаче</button><div id="sheet-slot"></div></div></div>
+<div class="ov" id="ov" hidden><div class="ov-in" id="ov-in"></div></div>
+<canvas id="fx" aria-hidden="true"></canvas>
 <div class="toasts" id="toasts" aria-live="polite"></div>
 
 <script>
@@ -714,15 +909,6 @@ function mulberry32(a){return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a
     h+='</div></details>'});
   $('#examples').innerHTML=h;rnd=Math.random})();
 
-/* ---------- состояние ---------- */
-const KEY='kubik-geometry-v1',LV=50;
-let S={em:3,di:0,xp:0,streak:0,best:0,right:0,total:0,solved:{},items:[]};
-try{const v=JSON.parse(localStorage.getItem(KEY));if(v&&typeof v==='object')S=Object.assign(S,v)}catch(e){}
-function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
-const level=()=>Math.floor(S.xp/LV)+1;
-function bump(el){el.classList.remove('bump');void el.offsetWidth;el.classList.add('bump')}
-function toast(html){const t=document.createElement('div');t.className='toast';t.innerHTML=html;const box=$('#toasts');box.appendChild(t);while(box.children.length>3)box.firstChild.remove();setTimeout(()=>t.remove(),2900)}
-
 /* ---------- сундук ---------- */
 const SW=['...11...','..1221..','..1221..','..1221..','..1221..','..1221..','.744447.','...55...','...55...','...66...'];
 const ITEMS=[
@@ -736,91 +922,399 @@ const ITEMS=[
  {id:'crown',name:'Корона',em:25,di:2,map:['2..22..2','22.22.22','22222222','23222232','22222222','11111111'],pal:{1:'#8a6a10',2:'#f6d046',3:'#e0302a'}},
  {id:'cup',name:'Кубок чемпиона',em:30,di:3,map:['11111111','1.2222.1','.122221.','..1221..','...22...','...22...','..1111..','.111111.'],pal:{1:'#a07a12',2:'#ffd84a'}}
 ];
-function renderItems(){$('#items').innerHTML=ITEMS.map(it=>{const own=S.items.includes(it.id),can=S.em>=it.em&&S.di>=it.di;
-  return `<div class="item ${own?'own':'locked'}"><div class="pic">${pix(it.map,it.pal,44)}</div><span class="nm">${it.name}</span>
-  <span class="pr"><span class="res">${em(16)}${it.em}</span>${it.di?`<span class="res">${di(16)}${it.di}</span>`:''}</span>
-  ${own?'<span class="nm">Есть!</span>':`<button class="btn small go" type="button" data-buy="${it.id}"${can?'':' disabled'}>Купить</button>`}</div>`}).join('')}
-$('#items').addEventListener('click',e=>{const b=e.target.closest('[data-buy]');if(!b)return;const it=ITEMS.find(i=>i.id===b.dataset.buy);
-  if(!it||S.items.includes(it.id)||S.em<it.em||S.di<it.di)return;S.em-=it.em;S.di-=it.di;S.items.push(it.id);save();ui();
-  toast(`${pix(it.map,it.pal,28)}<span>Новый предмет: <span class="y">${it.name}</span></span>`)});
-$('#trade').addEventListener('click',()=>{if(S.em<8)return;S.em-=8;S.di++;save();ui();toast(`${di(22)}<span>Обмен: <span class="y">+1 алмаз</span></span>`)});
 
-/* ---------- интерфейс ---------- */
-function ui(){
-  $('#h-em').textContent=S.em;$('#h-di').textContent=S.di;$('#h-streak').textContent=S.streak;
-  $('#h-lvl').textContent='Ур. '+level();$('#h-bar').style.width=(S.xp%LV)/LV*100+'%';
-  $('#st-right').textContent=S.right;$('#st-total').textContent=S.total;$('#st-best').textContent=S.best;
-  $('#st-types').textContent=`${TYPES.filter(t=>S.solved[t.id]).length} / ${TYPES.length}`;
-  document.querySelectorAll('[data-done]').forEach(e=>{const n=S.solved[e.dataset.done]||0;e.textContent=n?`Решено: ${n}`:'Ещё не решал';e.classList.toggle('yes',n>0)});
-  $('#trade').disabled=S.em<8;
-  if(cur){const off=cur.done;
-    $('#buy-hint').disabled=off||cur.hint||S.em<1;$('#buy-step').disabled=off||cur.step||S.em<2;$('#buy-sol').disabled=off||cur.sol||S.em<3}
-  renderItems();
-}
+/* =====================================================================
+   v2: состояние, ресурсы, походы, верстак, задания, анимации, звуки
+   ===================================================================== */
+const KEY='kubik-geometry-v1';
+const todayStr=(d=new Date())=>d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+const DEF=()=>({v:2,em:3,di:0,streak:0,best:0,right:0,total:0,solved:{},items:[],level:1,res:{wood:4,stone:2,coal:0,iron:0,gold:0,stick:0,torch:0},
+  tools:{},hike:null,lastHike:null,hikes:0,clean:0,weak:{},daily:null,days:[],dayAward:{},read:{},ach:{},sound:true,free:'all',fcur:null,crafted:0});
+let S=DEF();
+try{const v=JSON.parse(localStorage.getItem(KEY));if(v&&typeof v==='object'){
+  if(!v.v){ // перенос прогресса из первой версии
+    const lv=Math.floor((v.xp||0)/50)+1, base=DEF();
+    S=Object.assign(base,{em:v.em||0,di:v.di||0,best:v.best||0,right:v.right||0,total:v.total||0,solved:v.solved||{},items:v.items||[],level:lv});
+    const it=v.items||[];
+    if(it.includes('torch'))S.res.torch+=4;
+    if(it.includes('isword'))S.tools.isword=1;
+    if(it.includes('dsword'))S.tools.dsword=1;
+    if(it.includes('gpick')){S.tools.ipick=1}
+    if(it.includes('shield'))S.tools.helmet=1;
+    if(it.includes('crown'))S.tools.crown=1;
+    if(it.includes('cup'))S.tools.cup=1;
+    if(it.includes('apple'))S.tools.apple=1;
+    if(it.includes('potion'))S.tools.potion=1;
+  }else S=Object.assign(DEF(),v);
+  S.res=Object.assign(DEF().res,S.res||{});
+}}catch(e){}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
+function bump(el){if(!el)return;el.classList.remove('bump');void el.offsetWidth;el.classList.add('bump')}
+function toast(html){const t=document.createElement('div');t.className='toast';t.innerHTML=html;const box=$('#toasts');box.appendChild(t);while(box.children.length>3)box.firstChild.remove();setTimeout(()=>t.remove(),2900)}
+const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-/* ---------- тренажёр ---------- */
-let cur=null,last=null,mode='all',diff=0;
-const sel=$('#tr-type');
-sel.innerHTML='<option value="all">Все виды вперемешку</option>'+GROUPS.map(g=>`<optgroup label="${g.name}">${TYPES.filter(t=>t.g===g.id).map(t=>`<option value="${t.id}">${t.name} (${['','лёгкая','средняя','сложная'][t.d]})</option>`).join('')}</optgroup>`).join('');
-function pickType(){let c=mode!=='all'?TYPES.filter(t=>t.id===mode):diff?TYPES.filter(t=>t.d===diff):TYPES;
-  if(c.length>1)c=c.filter(t=>t.id!==last);
-  const w=c.map(t=>1/(1+(S.solved[t.id]||0)));let r=Math.random()*w.reduce((a,b)=>a+b),i=0;while(r>w[i]&&i<c.length-1){r-=w[i];i++}return c[i]}
-function newTask(saved){let t=null,seed=0;
-  if(saved&&saved.id){t=TYPES.find(x=>x.id===saved.id)||null;seed=saved.seed|0}
-  if(!t){t=pickType();seed=Math.floor(Math.random()*2147483647);saved=null}
-  last=t.id;rnd=mulberry32(seed);const d=t.gen();rnd=Math.random;
-  cur={t,d,seed,tries:0,hint:false,step:false,sol:false,done:false};
-  $('#tr-group').textContent=GROUPS.find(g=>g.id===t.g).name;$('#tr-reward').innerHTML='Награда '+gems(t.d);
-  $('#tr-name').textContent=t.name;$('#tr-q').textContent=d.q;$('#tr-u').textContent=d.u;$('#tr-fig').innerHTML=d.f;
-  $('#tr-a').value='';$('#tr-fb').textContent='';$('#tr-fb').className='fb';$('#tr-help').innerHTML='';
-  if(saved){cur.tries=saved.tries||0;cur.hint=!!saved.hint;cur.step=!!saved.step;cur.sol=!!saved.sol;$('#tr-a').value=saved.a||'';
-    if(cur.hint)addHelp('Подсказка',cur.d.hint);if(cur.step)addHelp('Первый шаг',cur.d.step);
-    if(cur.sol)addHelp('Решение',solHtml()+'<p class="hint">За эту задачу награды уже не будет, но разобраться важнее!</p>');
-    $('#tr-fb').textContent='Продолжаем задачу, которую ты не дорешал.';$('#tr-fb').className='fb'}
-  keepCur();ui()}
-function keepCur(){S.cur=cur&&!cur.done?{id:cur.t.id,seed:cur.seed,tries:cur.tries,hint:cur.hint,step:cur.step,sol:cur.sol,a:$('#tr-a').value}:null;save()}
-function addHelp(title,html){const d=document.createElement('div');d.innerHTML=`<b class="t">${title}</b>${html}`;$('#tr-help').appendChild(d)}
-const solHtml=()=>`<ol class="steps">${cur.d.steps.map(x=>`<li>${x}</li>`).join('')}<li><b>Ответ: ${cur.d.ans} ${cur.d.u}</b></li></ol>`;
-function buy(kind,price){if(!cur||cur.done||cur[kind]||S.em<price)return;S.em-=price;cur[kind]=true;bump($('#h-em'));
-  if(kind==='hint')addHelp('Подсказка',cur.d.hint);
-  if(kind==='step')addHelp('Первый шаг',cur.d.step);
-  if(kind==='sol')addHelp('Решение',solHtml()+'<p class="hint">За эту задачу награды уже не будет, но разобраться важнее!</p>');
-  keepCur();ui()}
-$('#buy-hint').addEventListener('click',()=>buy('hint',1));
-$('#buy-step').addEventListener('click',()=>buy('step',2));
-$('#buy-sol').addEventListener('click',()=>buy('sol',3));
+/* ---------- пиксельные картинки ресурсов и вещей ---------- */
+const STICKMAP=['......1.','.....12.','....12..','...12...','..12....','.12.....','12......','1.......'];
+const PICKMAP=['.111111.','12222221','1..55..1','...55...','...55...','...55...','...55...','...66...'];
+const INGOT=['........','........','..1111..','.122221.','12333321','12222221','.111111.','........'];
+const ART={
+  wood:{map:['.111111.','12222221','12333321','12344321','12344321','12333321','12222221','.111111.'],pal:{1:'#4e3218',2:'#8a5a35',3:'#b98a52',4:'#d9b07a'}},
+  stone:{map:['11111111','12232221','12222321','13222221','12223221','12322221','12222231','11111111'],pal:{1:'#4a4a4a',2:'#8d8d8d',3:'#6a6a6a'}},
+  coal:{map:['........','..1111..','.122211.','12233221','12222321','.122221.','..1111..','........'],pal:{1:'#111',2:'#2e2e2e',3:'#5a5a5a'}},
+  iron:{map:INGOT,pal:{1:'#5b5b5b',2:'#cfd6da',3:'#ffffff'}},
+  gold:{map:INGOT,pal:{1:'#8a6a10',2:'#f6d046',3:'#fff2a8'}},
+  diamond:{map:DI,pal:DIP}, emerald:{map:EM,pal:EMP},
+  stick:{map:STICKMAP,pal:{1:'#4e3218',2:'#9b6b3d'}},
+  torch:{map:['...44...','..3443..','..3443..','...55...','...55...','...55...','...55...','...66...'],pal:{3:'#f39a1d',4:'#ffe25a',5:'#7a5230',6:'#4e3218'}},
+  wpick:{map:PICKMAP,pal:{1:'#4e3218',2:'#b98a52',5:'#7a5230',6:'#4e3218'}},
+  spick:{map:PICKMAP,pal:{1:'#3b3b3b',2:'#9a9a9a',5:'#7a5230',6:'#4e3218'}},
+  ipick:{map:PICKMAP,pal:{1:'#5b5b5b',2:'#e6ecef',5:'#7a5230',6:'#4e3218'}},
+  dpick:{map:PICKMAP,pal:{1:'#0e6e7c',2:'#63f1f1',5:'#7a5230',6:'#4e3218'}},
+  ssword:{map:SW,pal:{1:'#3b3b3b',2:'#9a9a9a',4:'#6b4a2b',7:'#3b3b3b',5:'#7a5230',6:'#4e3218'}},
+  isword:{map:SW,pal:{1:'#3b3b3b',2:'#dfe6ea',4:'#6b4a2b',7:'#3b3b3b',5:'#7a5230',6:'#4e3218'}},
+  dsword:{map:SW,pal:{1:'#0e6e7c',2:'#63f1f1',4:'#f6d046',7:'#8a6a10',5:'#7a5230',6:'#4e3218'}},
+  helmet:{map:['........','.111111.','12222221','12333321','12....21','12....21','.1....1.','........'],pal:{1:'#4a4a4a',2:'#cfd6da',3:'#ffffff'}},
+  chest:{map:['11....11','12111121','12222221','.123321.','.122221.','.122221.','.122221.','.111111.'],pal:{1:'#4a4a4a',2:'#cfd6da',3:'#ffffff'}},
+  house:{map:['...11...','..1221..','.122221.','12222221','.344443.','.345543.','.345543.','.333333.'],pal:{1:'#7a1f14',2:'#c0392b',3:'#6b4a2b',4:'#b98a52',5:'#3a2a1a'}},
+  sword:{map:SW,pal:{1:'#3b3b3b',2:'#e6ecef',4:'#6b4a2b',7:'#3b3b3b',5:'#7a5230',6:'#4e3218'}},
+  pick:{map:PICKMAP,pal:{1:'#0e6e7c',2:'#63f1f1',5:'#b98a52',6:'#7a5230'}},
+  book:{map:['.111111.','12222221','12333321','12222221','12333321','12222221','12222221','.111111.'],pal:{1:'#3d2a14',2:'#a0522d',3:'#f1e3c0'}},
+  chestbox:{map:['11111111','12222221','13333331','14455441','12255221','12222221','12222221','11111111'],pal:{1:'#3d2a14',2:'#8a5a35',3:'#5a3d1e',4:'#5a3d1e',5:'#f6d046'}},
+  star:{map:['...11...','...11...','11111111','.122221.','..1221..','.12..21.','.1....1.','........'],pal:{1:'#c8a20c',2:'#ffe25a'}},
+  flame:{map:['...1....','..121...','..1221..','.12321..','.123321.','12333221','12233321','.111111.'],pal:{1:'#a8320f',2:'#f39a1d',3:'#ffe25a'}}
+};
+ITEMS.forEach(it=>{if(!ART[it.id])ART[it.id]={map:it.map,pal:it.pal}});
+ART.crown=ART.crown||{map:ITEMS.find(i=>i.id==='crown').map,pal:ITEMS.find(i=>i.id==='crown').pal};
+ART.cup=ART.cup||{map:ITEMS.find(i=>i.id==='cup').map,pal:ITEMS.find(i=>i.id==='cup').pal};
+const art=(id,s)=>ART[id]?pix(ART[id].map,ART[id].pal,s||24):'';
+document.querySelectorAll('[data-pix]').forEach(e=>e.innerHTML=art(e.dataset.pix,26));
+
+const RES=[{id:'wood',name:'Дерево'},{id:'stone',name:'Камень'},{id:'coal',name:'Уголь'},{id:'iron',name:'Железо'},{id:'gold',name:'Золото'},{id:'diamond',name:'Алмаз'},{id:'stick',name:'Палка'},{id:'torch',name:'Факел'}];
+const resName=id=>(RES.find(r=>r.id===id)||{}).name||id;
+const have=id=>id==='diamond'?S.di:(S.res[id]||0);
+function addRes(id,n){if(id==='diamond')S.di+=n;else S.res[id]=(S.res[id]||0)+n}
+
+/* ---------- рецепты ---------- */
+const RECIPES=[
+ {id:'stick',name:'Палки ×4',lvl:1,need:{wood:2},out:{stick:4},eff:'Нужны почти для всех инструментов.'},
+ {id:'torch',name:'Факелы ×4',lvl:1,need:{stick:1,coal:1},out:{torch:4},eff:'Факел — бесплатная подсказка в задаче.'},
+ {id:'wpick',name:'Деревянная кирка',lvl:1,need:{wood:3,stick:2},tool:1,eff:'+1 ресурс за лёгкие задачи.'},
+ {id:'spick',name:'Каменная кирка',lvl:2,need:{stone:3,stick:2},tool:1,eff:'+1 ресурс за лёгкие и средние задачи.'},
+ {id:'ssword',name:'Каменный меч',lvl:2,need:{stone:2,stick:1},tool:1,eff:'+1 изумруд за сложные задачи.'},
+ {id:'ipick',name:'Железная кирка',lvl:3,need:{iron:3,stick:2},tool:1,eff:'+1 ресурс за все задачи.'},
+ {id:'isword',name:'Железный меч',lvl:3,need:{iron:2,stick:1},tool:1,eff:'+1 изумруд за средние и сложные задачи.'},
+ {id:'helmet',name:'Железный шлем',lvl:4,need:{iron:5},tool:1,eff:'Одна ошибка за поход не сбрасывает серию.'},
+ {id:'chest',name:'Железный нагрудник',lvl:4,need:{iron:8},tool:1,eff:'Вторая попытка не уменьшает награду.'},
+ {id:'crown',name:'Золотая корона',lvl:5,need:{gold:5,diamond:1},tool:1,eff:'Трофей: +1 алмаз за каждый чистый поход.'},
+ {id:'dpick',name:'Алмазная кирка',lvl:6,need:{diamond:3,stick:2},tool:1,eff:'+1 ресурс за все задачи, +2 за сложные.'},
+ {id:'dsword',name:'Алмазный меч',lvl:6,need:{diamond:2,stick:1},tool:1,eff:'+1 изумруд за средние, +2 за сложные.'},
+ {id:'cup',name:'Кубок чемпиона',lvl:8,need:{gold:4,diamond:3},tool:1,eff:'Главный трофей. Ты — мастер квадратов!'}
+];
+const tool=id=>!!S.tools[id];
+function pickTier(){return tool('dpick')?4:tool('ipick')?3:tool('spick')?2:tool('wpick')?1:0}
+function canCraft(r){return S.level>=r.lvl&&!(r.tool&&tool(r.id))&&Object.entries(r.need).every(([k,n])=>have(k)>=n)}
+function doCraft(id){const r=RECIPES.find(x=>x.id===id);if(!r||!canCraft(r))return;
+  Object.entries(r.need).forEach(([k,n])=>addRes(k,-n));
+  if(r.tool)S.tools[r.id]=1;else Object.entries(r.out).forEach(([k,n])=>addRes(k,n));
+  S.crafted=(S.crafted||0)+1;questAdd('craft',1);save();
+  sfx('craft');const el=document.querySelector(`[data-craft="${id}"]`);if(el){const b=el.getBoundingClientRect();burst(b.left+b.width/2,b.top,['#f6d046','#ffffff','#83cf5c'],28)}
+  toast(`${art(r.tool?r.id:Object.keys(r.out)[0],26)}<span>Скрафчено: <span class="y">${r.name}</span></span>`);checkAch();render()}
+
+/* ---------- звуки (8 бит, без файлов) ---------- */
+let AC=null;
+function sfx(kind){if(!S.sound)return;try{AC=AC||new (window.AudioContext||window.webkitAudioContext)();if(AC.state==='suspended')AC.resume();
+  const seq={ok:[[660,.07],[880,.09]],bad:[[220,.12],[180,.14]],coin:[[988,.05],[1319,.08]],lvl:[[523,.1],[659,.1],[784,.1],[1047,.22]],craft:[[392,.06],[523,.06],[784,.12]],chest:[[523,.08],[784,.08],[1047,.08],[1319,.2]]}[kind]||[[440,.1]];
+  let t=AC.currentTime;seq.forEach(([f,d])=>{const o=AC.createOscillator(),g=AC.createGain();o.type='square';o.frequency.value=f;g.gain.setValueAtTime(.06,t);g.gain.exponentialRampToValueAtTime(.001,t+d);o.connect(g);g.connect(AC.destination);o.start(t);o.stop(t+d+.02);t+=d})}catch(e){}}
+
+/* ---------- частицы ---------- */
+const fx=$('#fx'),fxc=fx.getContext('2d');let parts=[],fxOn=false;
+function fxSize(){const r=devicePixelRatio||1;fx.width=innerWidth*r;fx.height=innerHeight*r;fxc.setTransform(r,0,0,r,0,0)}fxSize();addEventListener('resize',fxSize);
+function burst(x,y,cols,n){if(reduce)return;for(let i=0;i<(n||20);i++){const a=Math.random()*Math.PI*2,v=2+Math.random()*5;parts.push({x,y,vx:Math.cos(a)*v,vy:Math.sin(a)*v-3,s:4+Math.random()*6,c:cols[i%cols.length],l:40+Math.random()*30})}if(!fxOn){fxOn=true;requestAnimationFrame(tick)}}
+function rain(cols,n){if(reduce)return;for(let i=0;i<n;i++)parts.push({x:Math.random()*innerWidth,y:-20-Math.random()*innerHeight*.5,vx:(Math.random()-.5)*2,vy:2+Math.random()*3,s:6+Math.random()*6,c:cols[i%cols.length],l:160});if(!fxOn){fxOn=true;requestAnimationFrame(tick)}}
+function tick(){fxc.clearRect(0,0,innerWidth,innerHeight);parts=parts.filter(p=>p.l>0&&p.y<innerHeight+30);
+  parts.forEach(p=>{p.x+=p.vx;p.y+=p.vy;p.vy+=.25;p.l--;fxc.fillStyle=p.c;fxc.fillRect(p.x,p.y,p.s,p.s);fxc.fillStyle='rgba(0,0,0,.25)';fxc.fillRect(p.x+p.s*.55,p.y+p.s*.55,p.s*.45,p.s*.45)});
+  if(parts.length)requestAnimationFrame(tick);else{fxOn=false;fxc.clearRect(0,0,innerWidth,innerHeight)}}
+function flyTo(fromEl,id,n){const scr=document.querySelector('.screen:not([hidden])');const target=scr&&scr.querySelector(id==='emerald'?'.coin.em':'.coin.di');
+  const a=fromEl.getBoundingClientRect();const plus=document.createElement('div');plus.className='plus';plus.textContent='+'+n;plus.style.left=(a.left+a.width/2-14)+'px';plus.style.top=(a.top-10)+'px';document.body.appendChild(plus);setTimeout(()=>plus.remove(),1000);
+  if(!target||reduce){bump(target);return}const b=target.getBoundingClientRect();
+  for(let i=0;i<Math.min(n,4);i++){const f=document.createElement('div');f.className='fly';f.innerHTML=art(id,26);f.style.left=(a.left+a.width/2-13)+'px';f.style.top=(a.top+a.height/2-13)+'px';document.body.appendChild(f);
+    setTimeout(()=>{f.style.transform=`translate(${b.left+b.width/2-(a.left+a.width/2)}px,${b.top+b.height/2-(a.top+a.height/2)}px) scale(.6)`;f.style.opacity='.4'},30+i*90);
+    setTimeout(()=>{f.remove();bump(target)},800+i*90)}}
+
+/* ---------- ежедневные задания и дни подряд ---------- */
+const QPOOL=[{k:'hike',t:'Заверши поход',n:1},{k:'hard',t:'Реши 3 сложные задачи в походе',n:3},{k:'row',t:'Реши 5 задач подряд без ошибок',n:5},
+  {k:'cx',t:'Реши 2 задачи на сложные фигуры',n:2},{k:'rule',t:'Прочитай одно правило',n:1},{k:'nohint',t:'Реши 4 задачи без подсказок',n:4},{k:'craft',t:'Скрафти вещь на верстаке',n:1}];
+function ensureDaily(){const d=todayStr();if(S.daily&&S.daily.d===d)return;
+  let h=0;for(const ch of d)h=(h*31+ch.charCodeAt(0))>>>0;const r=mulberry32(h),pool=QPOOL.slice(1);
+  const a=[];while(a.length<2){const q=pool[Math.floor(r()*pool.length)];if(!a.includes(q))a.push(q)}
+  S.daily={d,q:[QPOOL[0],...a].map(q=>({k:q.k,t:q.t,n:q.n,p:0})),claimed:false,row:0};save()}
+function questAdd(k,v,setMax){ensureDaily();let ch=false;S.daily.q.forEach(q=>{if(q.k!==k||q.p>=q.n)return;const np=setMax?Math.max(q.p,v):q.p+v;if(np!==q.p){q.p=Math.min(q.n,np);ch=true;if(q.p>=q.n)setTimeout(()=>{toast(`${art('star',24)}<span>Задание выполнено: <span class="y">${q.t}</span></span>`);sfx('coin')},300)}});if(ch)save()}
+function claimDaily(){ensureDaily();if(S.daily.claimed||!S.daily.q.every(q=>q.p>=q.n))return;S.daily.claimed=true;
+  S.di+=1;S.em+=3;addRes('iron',2);addRes('wood',3);addRes('coal',1);save();sfx('chest');rain(['#1fae4f','#35d0e0','#f6d046','#ffffff'],70);
+  showOv(`<div class="bigicon">${art('chestbox',96)}</div><h2>Сундук открыт!</h2><div class="loot"><span>${art('diamond',20)}+1</span><span>${art('emerald',20)}+3</span><span>${art('iron',20)}+2</span><span>${art('wood',20)}+3</span><span>${art('coal',20)}+1</span></div><button class="btn go big" type="button" data-close>Забрать</button>`);render()}
+function markDay(){const d=todayStr();if(!S.days.includes(d)){S.days.push(d);S.days=S.days.slice(-60);save();
+  const n=dayStreak(),bonus={3:1,7:2,14:3,30:5}[n];if(bonus){const start=S.days[S.days.length-n];if(S.dayAward[n]!==start){S.dayAward[n]=start;S.di+=bonus;save();
+    setTimeout(()=>{showOv(`<div class="bigicon">${art('flame',96)}</div><h2>${n} ${plural(n,'день','дня','дней')} подряд!</h2><p>Награда за упорство: <b>+${bonus} ${plural(bonus,'алмаз','алмаза','алмазов')}</b></p><button class="btn go big" type="button" data-close>Ура!</button>`);rain(['#f39a1d','#ffe25a','#35d0e0'],60);sfx('lvl')},1200)}}}}
+function dayStreak(){let n=0,d=new Date();if(!S.days.includes(todayStr(d)))d.setDate(d.getDate()-1);while(S.days.includes(todayStr(d))){n++;d.setDate(d.getDate()-1)}return n}
+
+/* ---------- достижения ---------- */
+const ACH=[
+ {id:'first',t:'Первый поход',s:'Заверши любой поход',ic:'sword',ok:()=>S.hikes>=1},
+ {id:'l3',t:'Уровень 3',s:'Дойди до 3 уровня',ic:'star',ok:()=>S.level>=3},
+ {id:'l5',t:'Уровень 5',s:'Дойди до 5 уровня',ic:'star',ok:()=>S.level>=5},
+ {id:'l10',t:'Мастер',s:'Дойди до 10 уровня',ic:'crown',ok:()=>S.level>=10},
+ {id:'rev',t:'Не забываю',s:'Пройди 3 повторения',ic:'book',ok:()=>(S.reviews||0)>=3},
+ {id:'clean',t:'Чистый поход',s:'10 из 10 в походе',ic:'diamond',ok:()=>S.clean>=1},
+ {id:'d7',t:'Неделя подряд',s:'Занимайся 7 дней подряд',ic:'flame',ok:()=>dayStreak()>=7},
+ {id:'craft',t:'Мастер верстака',s:'Скрафти первую вещь',ic:'wpick',ok:()=>(S.crafted||0)>=1},
+ {id:'dpick',t:'Алмазная кирка',s:'Скрафти алмазную кирку',ic:'dpick',ok:()=>tool('dpick')},
+ {id:'row10',t:'Серия 10',s:'10 верных ответов подряд',ic:'flame',ok:()=>S.best>=10},
+ {id:'all',t:'Все виды',s:'Реши задачи всех видов',ic:'book',ok:()=>TYPES.every(t=>S.solved[t.id])},
+ {id:'t100',t:'Сотня',s:'100 верных ответов в походах',ic:'emerald',ok:()=>S.right>=100},
+ {id:'rules',t:'Знаток правил',s:'Прочитай все правила',ic:'book',ok:()=>TH.every(x=>S.read[x.k])}
+];
+function checkAch(){ACH.forEach(a=>{if(!S.ach[a.id]&&a.ok()){S.ach[a.id]=todayStr();save();setTimeout(()=>{toast(`${art(a.ic,26)}<span>Достижение: <span class="y">${a.t}</span></span>`);sfx('coin')},600)}})}
+
+/* ---------- оверлей ---------- */
+function showOv(html){$('#ov-in').innerHTML=html;$('#ov').hidden=false;const b=$('#ov-in').querySelector('[data-close]');if(b)b.focus()}
+$('#ov').addEventListener('click',e=>{if(e.target.closest('[data-close]')){$('#ov').hidden=true;render()}});
+
+/* ---------- теория ---------- */
+const TH=[{k:'perimetr',t:'Периметр',s:'Длина забора вокруг'},{k:'ploshad',t:'Площадь',s:'Сколько клеточек внутри'},{k:'raznica',t:'P или S?',s:'Как не перепутать'},
+  {k:'edinicy',t:'Единицы',s:'см, дм, м и квадратные'},{k:'slozhnye',t:'Сложные фигуры',s:'Разрежь или дострой'},{k:'lab',t:'Лаборатория',s:'Построй сам'},
+  {k:'zadachi',t:'Примеры задач',s:'Все виды с решениями'},{k:'oshibki',t:'Частые ошибки',s:'Чего избегать'},{k:'shpora',t:'Шпаргалка',s:'Все формулы в таблице'}];
+const RULE_OF={rP:'perimetr',sqP:'perimetr',rSideP:'perimetr',sqSideP:'perimetr',cLP:'slozhnye',cStair:'slozhnye',rS:'ploshad',sqS:'ploshad',rSideS:'ploshad',sqSideS:'ploshad',cCount:'ploshad',
+  rSbyP:'shpora',rPbyS:'shpora',sqSameP:'shpora',sqSameS:'shpora',rTimes:'raznica',rMore:'raznica',rCompare:'ploshad',cLS:'slozhnye',cLC:'slozhnye',cPond:'slozhnye',cTile:'slozhnye',cMaxS:'raznica',rUnits:'edinicy',uArea:'edinicy',uSq:'edinicy'};
+const thNode=k=>document.querySelector(`#th-store [data-k="${k}"]`)||document.querySelector(`[data-k="${k}"]`);
+function readRule(k){if(!S.read[k]){S.read[k]=1;S.em+=1;save();toast(`${art('emerald',22)}<span>Правило прочитано: <span class="y">+1 изумруд</span></span>`);sfx('coin')}questAdd('rule',1);checkAch()}
+function renderTheoryGrid(){$('#th-grid').innerHTML=TH.map(x=>`<button class="tile" type="button" data-th="${x.k}"><b>${x.t}</b><span>${x.s}</span>${S.read[x.k]?'':'<span class="new">+1 изумруд за чтение</span>'}</button>`).join('')}
+let thOpen=null;
+function openTheory(k){closeTheory();const n=thNode(k);if(!n)return;$('#th-slot').appendChild(n);n.hidden=false;thOpen=n;$('#th-grid').hidden=true;$('#th-view').hidden=false;scrollTo(0,0);readRule(k)}
+function closeTheory(){if(thOpen){thOpen.hidden=true;$('#th-store').appendChild(thOpen);thOpen=null}$('#th-grid').hidden=false;$('#th-view').hidden=true;renderTheoryGrid();renderWallets()}
+$('#th-grid').addEventListener('click',e=>{const b=e.target.closest('[data-th]');if(b)openTheory(b.dataset.th)});
+$('#th-back').addEventListener('click',closeTheory);
+let sheetNode=null;
+function openSheet(k){closeTheory();const n=thNode(k);if(!n)return;$('#sheet-slot').appendChild(n);n.hidden=false;sheetNode=n;$('#sheet').hidden=false;$('#sheet .sheet-in').scrollTop=0;readRule(k);renderWallets()}
+function closeSheet(){if(sheetNode){sheetNode.hidden=true;$('#th-store').appendChild(sheetNode);sheetNode=null}$('#sheet').hidden=true}
+$('#sheet-close').addEventListener('click',closeSheet);
+$('#sheet').addEventListener('click',e=>{if(e.target.id==='sheet')closeSheet()});
+
+/* ---------- навигация ---------- */
+let tab='home';
+function go(t){if(t!==tab&&tab==='play')$('#p-sum').hidden=true;tab=t;closeSheet();if(t!=='theory'&&thOpen)closeTheory();
+  document.querySelectorAll('.screen').forEach(s=>s.hidden=s.id!=='s-'+t);
+  document.querySelectorAll('.tab').forEach(b=>b.classList.toggle('on',b.dataset.tab===t));scrollTo(0,0);render()}
+$('#tabs').addEventListener('click',e=>{const b=e.target.closest('[data-tab]');if(b)go(b.dataset.tab)});
+
+/* ---------- поход ---------- */
+function weighted(arr,w){let r=Math.random()*w.reduce((a,b)=>a+b,0),i=0;while(r>w[i]&&i<arr.length-1){r-=w[i];i++}return arr[i]}
+const MAXL=10;
+const RANKS=[{l:1,t:'Новичок',c:'#b9c0c8'},{l:3,t:'Шахтёр',c:'#c08a4b'},{l:5,t:'Кузнец',c:'#e6ecef'},{l:7,t:'Строитель',c:'#f6d046'},{l:9,t:'Архитектор',c:'#35d0e0'},{l:10,t:'Мастер',c:'#7fe03a'}];
+const rank=L=>RANKS.filter(r=>r.l<=L).pop();
+const nextRank=L=>RANKS.find(r=>r.l>L);
+const isMaster=()=>S.level>=MAXL;
+const daysSince=d=>d?Math.round((new Date(todayStr())-new Date(d))/864e5):999;
+const reviewDue=()=>daysSince(S.lastReview)>=3;
+function makeHike(){const L=S.level,review=isMaster(),plan=review?['rect','sq','cx','un',pick(['rect','sq','cx'])]:['rect','rect','rect','sq','sq','sq','cx','cx','un','un'];
+  const dist=review?[.1,.5,.4]:L<=1?[.6,.4,0]:L===2?[.45,.45,.1]:L===3?[.3,.5,.2]:L===4?[.2,.5,.3]:[.1,.5,.4];
+  const used=new Set(),list=[];
+  plan.forEach(g=>{const r=Math.random(),d=r<dist[0]?1:r<dist[0]+dist[1]?2:3;
+    let c=TYPES.filter(t=>t.g===g);const best=Math.min(...c.map(t=>Math.abs(t.d-d)));c=c.filter(t=>Math.abs(t.d-d)===best);
+    const fresh=c.filter(t=>!used.has(t.id));if(fresh.length)c=fresh;
+    const t=weighted(c,c.map(t=>1+3*(S.weak[t.id]||0)+1/(1+(S.solved[t.id]||0))));used.add(t.id);list.push(t)});
+  if(L>=5&&!review){let n3=list.filter(t=>t.d===3).length;for(let i=0;i<list.length&&n3<2;i++){if(list[i].d<3){const alt=TYPES.filter(t=>t.g===list[i].g&&t.d===3&&!used.has(t.id));if(alt.length){list[i]=pick(alt);used.add(list[i].id);n3++}}}}
+  for(let i=list.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[list[i],list[j]]=[list[j],list[i]]}
+  return{tasks:list.map(t=>({id:t.id,seed:Math.floor(Math.random()*2147483647),r:null,tries:0,hint:0,step:0,sol:0,a:''})),i:0,gain:{em:0,res:{}},shield:false,lvl:L,n:plan.length,need:review?4:8,kind:review?'review':'hike'}}
+let C=null; // текущая задача {t,d,rec,mode}
+function genTask(rec){const t=TYPES.find(x=>x.id===rec.id)||TYPES[0];rnd=mulberry32(rec.seed|0);const d=t.gen();rnd=Math.random;return{t,d}}
+const hN=h=>h.n||h.tasks.length,hNeed=h=>h.need||(hN(h)===10?8:4),hKind=h=>h.kind||'hike';
+function startHike(){S.hike=makeHike();save();sfx('coin');openTask()}
+function startFree(type){S.free=type||S.free||'all';const pool=S.free==='all'?TYPES:TYPES.filter(t=>t.id===S.free);
+  const t=pick(pool);S.fcur={id:t.id,seed:Math.floor(Math.random()*2147483647),r:null,tries:0,hint:0,step:0,sol:0,a:''};save();openTask()}
+function mode(){return S.hike?'hike':S.fcur?'free':null}
+function curRec(){return S.hike?S.hike.tasks[S.hike.i]:S.fcur}
+function openTask(){const rec=curRec();if(!rec){renderPlay();return}const {t,d}=genTask(rec);C={t,d,rec,mode:mode()};
+  $('#t-group').textContent=GROUPS.find(g=>g.id===t.g).name;
+  $('#t-reward').innerHTML=C.mode==='hike'?'Награда '+gems(t.d):'Без наград';
+  $('#t-name').textContent=t.name;$('#t-q').textContent=d.q;$('#t-fig').innerHTML=d.f;$('#t-u').textContent=d.u;
+  const inp=$('#t-a');inp.value=rec.a||'';inp.className='';inp.disabled=rec.r!==null;
+  $('#t-fb').textContent=rec.tries&&rec.r===null?'Вторая попытка. Проверь вычисления.':'';$('#t-fb').className='fb';
+  $('#t-help').innerHTML='';
+  if(rec.hint)addHelp('Подсказка',d.hint);if(rec.step)addHelp('Первый шаг',d.step);if(rec.sol||rec.r!==null)addHelp(rec.r===null?'Решение':'Как решали',solHtml());
+  $('#t-check').hidden=rec.r!==null;$('#t-next').hidden=rec.r===null;$('#t-btns').hidden=rec.r!==null;
+  setNextLabel();renderPlay();updHelpBtns()}
+function addHelp(title,html){const el=document.createElement('div');el.innerHTML=`<b class="t">${title}</b>${html}`;$('#t-help').appendChild(el)}
+const solHtml=()=>`<ol class="steps">${C.d.steps.map(x=>`<li>${x}</li>`).join('')}<li><b>Ответ: ${C.d.ans} ${C.d.u}</b></li></ol>`;
+function setNextLabel(){$('#t-next').textContent=C.mode==='hike'&&S.hike.i===hN(S.hike)-1?(hKind(S.hike)==='review'?'Итоги повторения →':'Итоги похода →'):'Дальше →'}
+function updHelpBtns(){if(!C)return;const r=C.rec,free=C.mode==='free',torch=have('torch');
+  $('#t-hint').innerHTML=r.hint?'Подсказка ✓':free?'Подсказка':torch?`Подсказка ${art('torch',18)}1`:`Подсказка ${em(16)}1`;
+  $('#t-step').innerHTML=r.step?'Первый шаг ✓':free?'Первый шаг':`Первый шаг ${em(16)}2`;
+  $('#t-sol').innerHTML=r.sol?'Решение ✓':free?'Решение':`Решение ${em(16)}3`;
+  $('#t-hint').disabled=!!r.hint||(!free&&!torch&&S.em<1);$('#t-step').disabled=!!r.step||(!free&&S.em<2);$('#t-sol').disabled=!!r.sol||(!free&&S.em<3)}
+function buy(kind){const r=C.rec;if(r[kind]||r.r!==null)return;const free=C.mode==='free';
+  if(!free){if(kind==='hint'&&have('torch')){S.res.torch--}else{const price={hint:1,step:2,sol:3}[kind];if(S.em<price)return;S.em-=price}}
+  r[kind]=1;if(kind==='hint')addHelp('Подсказка',C.d.hint);if(kind==='step')addHelp('Первый шаг',C.d.step);
+  if(kind==='sol')addHelp('Решение',solHtml()+(free?'':'<p class="hint">Эта задача уже не будет засчитана, но разобраться важнее!</p>'));
+  save();renderWallets();updHelpBtns()}
+$('#t-hint').addEventListener('click',()=>buy('hint'));$('#t-step').addEventListener('click',()=>buy('step'));$('#t-sol').addEventListener('click',()=>buy('sol'));
+$('#t-rule').addEventListener('click',()=>openSheet(RULE_OF[C.t.id]||'shpora'));
+$('#t-a').addEventListener('input',()=>{if(C&&C.rec.r===null){C.rec.a=$('#t-a').value;save()}});
+$('#t-a').addEventListener('keydown',e=>{if(e.key==='Enter')check()});
+$('#t-check').addEventListener('click',check);
 function parseNum(s){const r=String(s).replace(',','.').match(/\d+(\.\d+)?/);return r?Number(r[0]):null}
-function check(){if(!cur||cur.done)return;const v=parseNum($('#tr-a').value),fb=$('#tr-fb');
+function typical(v){const n=(C.d.q.match(/\d+/g)||[]).map(Number),id=C.t.id,[a,b]=n;
+  if(id==='rP'){if(v===a+b)return'Это только половина периметра. Умножь на 2!';if(v===a*b)return'Это площадь, а нужен периметр: складываем стороны.'}
+  if(id==='sqP'){if(v===a*a)return'Ты нашёл площадь. Периметр квадрата — a · 4.';if(v===a*2)return'У квадрата 4 стороны, а не 2.'}
+  if(id==='rS'){if(v===(a+b)*2)return'Это периметр. Площадь — умножаем длину на ширину.';if(v===a+b)return'Площадь — это умножение, а не сложение.'}
+  if(id==='sqS'&&v===a*4)return'Это периметр. Площадь квадрата — a · a.';
+  if(id==='rSideP'&&v===a-b)return'Сначала раздели периметр на 2, потом вычитай.';
+  return''}
+function drop(d){const tier=pickTier(),out={};const add=(k,n)=>out[k]=(out[k]||0)+n;
+  if(d===1)add(Math.random()<.6?'wood':'stone',1+(Math.random()<.4?1:0));
+  else if(d===2){Math.random()<.55?add('iron',1):add('coal',2);add('stone',1)}
+  else{Math.random()<.4?add('diamond',1):add('gold',1);add('iron',1)}
+  const main=Object.keys(out)[0];
+  if(tier>=1&&d<=tier)add(main,1);if(tier>=4&&d===3)add(main,1);
+  return out}
+function check(){if(!C||C.rec.r!==null)return;const inp=$('#t-a'),fb=$('#t-fb'),v=parseNum(inp.value),rec=C.rec,hike=C.mode==='hike';
   if(v===null){fb.textContent='Впиши число в окошко.';fb.className='fb no';return}
-  cur.tries++;if(cur.tries===1)S.total++;
-  if(v===cur.d.ans){cur.done=true;const id=cur.t.id;
-    if(cur.sol){fb.textContent='Верно! Решение было открыто, поэтому без награды.';fb.className='fb ok'}
-    else{const gain=Math.max(0,cur.t.d-(cur.tries>1?1:0)),xp=cur.t.d*10,oldL=level();
-      S.em+=gain;S.xp+=xp;S.solved[id]=(S.solved[id]||0)+1;
-      if(cur.tries===1){S.right++;S.streak++;S.best=Math.max(S.best,S.streak);
-        if(S.streak%5===0){S.di++;bump($('#h-di'));const k=S.streak;setTimeout(()=>toast(`${di(22)}<span>${k} подряд! <span class="y">+1 алмаз</span></span>`),400)}}
-      if(level()>oldL){S.di++;bump($('#h-di'));const L=level();setTimeout(()=>toast(`${di(22)}<span>Уровень ${L}! <span class="y">+1 алмаз</span></span>`),800)}
-      fb.textContent=`Верно! +${gain} ${plural(gain,'изумруд','изумруда','изумрудов')}, +${xp} опыта`;fb.className='fb ok';
-      if(gain)toast(`${em(22)}<span class="y">+${gain} ${plural(gain,'изумруд','изумруда','изумрудов')}</span>`);bump($('#h-em'))}
-    if(!cur.sol)addHelp('Как решали',solHtml());
-    keepCur();ui();$('#tr-next').focus()}
-  else{S.streak=0;fb.className='fb no';
-    fb.textContent=cur.tries===1&&!cur.sol?(cur.t.d>1?'Пока неверно. Проверь вычисления. Награда станет на 1 изумруд меньше.':'Пока неверно. Проверь вычисления или возьми подсказку.'):'Снова не то. Посмотри на рисунок или возьми подсказку.';
-    keepCur();ui()}}
-$('#tr-check').addEventListener('click',check);
-$('#tr-a').addEventListener('keydown',e=>{if(e.key==='Enter')check()});
-$('#tr-a').addEventListener('input',()=>{if(cur&&!cur.done)keepCur()});
-$('#tr-next').addEventListener('click',newTask);
-sel.addEventListener('change',()=>{mode=sel.value;if(mode!=='all'){diff=0;setChips()}newTask()});
-function setChips(){document.querySelectorAll('.chip').forEach(c=>c.classList.toggle('on',+c.dataset.d===diff))}
-document.querySelectorAll('.chip').forEach(c=>c.addEventListener('click',()=>{diff=+c.dataset.d;mode='all';sel.value='all';setChips();newTask()}));
-$('#examples').addEventListener('click',e=>{const b=e.target.closest('[data-train]');if(!b)return;mode=b.dataset.train;sel.value=mode;diff=0;setChips();newTask();
-  document.getElementById('trener').scrollIntoView({behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth'})});
+  rec.tries++;
+  if(v===C.d.ans){inp.className='ok';rec.r=!rec.sol;S.solved[C.t.id]=(S.solved[C.t.id]||0)+(hike?1:0);
+    const r=inp.getBoundingClientRect();burst(r.left+r.width/2,r.top+r.height/2,['#1fae4f','#7cf2a6','#f6d046','#ffffff'],26);sfx('ok');
+    if(hike&&!rec.sol){const d=C.t.d;let gain=d-(rec.tries>1&&!tool('chest')?1:0);
+      if(d===3)gain+=tool('dsword')?2:tool('isword')||tool('ssword')?1:0;else if(d===2)gain+=tool('dsword')||tool('isword')?1:0;
+      gain=Math.max(0,gain);S.em+=gain;S.hike.gain.em+=gain;
+      const loot=drop(d);Object.entries(loot).forEach(([k,n])=>{addRes(k,n);S.hike.gain.res[k]=(S.hike.gain.res[k]||0)+n});
+      if(rec.tries===1){S.right++;S.streak++;S.best=Math.max(S.best,S.streak);S.daily&&(S.daily.row=Math.max(S.daily.row||0,S.streak));questAdd('row',S.streak,true)}else{S.right++}
+      if(d===3)questAdd('hard',1);if(C.t.g==='cx')questAdd('cx',1);if(!rec.hint&&!rec.step)questAdd('nohint',1);
+      S.total++;markDay();
+      fb.innerHTML=`Верно! +${gain} ${plural(gain,'изумруд','изумруда','изумрудов')} и ${Object.entries(loot).map(([k,n])=>`${art(k,18)}${n}`).join(' ')}`;fb.className='fb ok';
+      if(gain)setTimeout(()=>flyTo(inp,'emerald',gain),150);
+      if(S.streak>0&&S.streak%5===0){S.di++;setTimeout(()=>{toast(`${art('flame',24)}<span>${S.streak} подряд! <span class="y">+1 алмаз</span></span>`);flyTo(inp,'diamond',1)},700)}}
+    else{fb.textContent=rec.sol?'Верно! Решение было открыто, поэтому задача не засчитана.':pick(['Верно!','Отлично!','Так держать!','Супер!']);fb.className='fb ok';if(hike){S.total++;S.streak=0}}
+    if(!rec.sol)addHelp('Как решали',solHtml());finishTask()}
+  else{inp.className='bad';inp.classList.remove('shake');void inp.offsetWidth;inp.classList.add('shake');sfx('bad');
+    const tip=typical(v);
+    if(hike&&rec.tries>=2){rec.r=false;S.total++;S.weak[C.t.id]=(S.weak[C.t.id]||0)+1;
+      S.streak=0;
+      fb.innerHTML=`Не получилось. Правильный ответ: <b>${C.d.ans} ${C.d.u}</b>. Посмотри решение — в следующий раз получится!`;fb.className='fb no';
+      addHelp('Решение',solHtml());finishTask()}
+    else{if(hike){if(tool('helmet')&&!S.hike.shield&&S.streak>0){S.hike.shield=true;toast(`${art('helmet',24)}<span>Шлем сберёг серию!</span>`)}else S.streak=0}
+      fb.innerHTML=(tip?`<span class="typical">${tip}</span> `:'')+(hike?'Пока неверно. Есть ещё одна попытка!':'Пока неверно. Попробуй ещё раз!');fb.className='fb no';
+      save()}}
+  save();renderWallets();updHelpBtns();checkAch()}
+function finishTask(){$('#t-a').disabled=true;$('#t-check').hidden=true;$('#t-btns').hidden=true;$('#t-next').hidden=false;setNextLabel();save();renderPlay();setTimeout(()=>$('#t-next').scrollIntoView({block:'nearest',behavior:reduce?'auto':'smooth'}),350)}
+$('#t-next').addEventListener('click',()=>{if(C.mode==='hike'){if(S.hike.i<hN(S.hike)-1){S.hike.i++;save();openTask();scrollTo(0,0)}else endHike()}else{startFree(S.free);scrollTo(0,0)}});
+$('#t-leave').addEventListener('click',()=>{if(C&&C.mode==='free'){S.fcur=null;save();C=null;renderPlay()}else{go('home')}});
+function endHike(){const h=S.hike,n=hN(h),need=hNeed(h),rev=hKind(h)==='review',ok=h.tasks.filter(t=>t.r===true).length,pass=ok>=need,clean=ok===n;
+  h.tasks.forEach(t=>{if(t.r===true&&S.weak[t.id])S.weak[t.id]=Math.max(0,S.weak[t.id]-1)});
+  S.hikes++;let bonus='';const oldL=S.level;
+  let up=false;
+  if(rev){if(pass&&reviewDue()){S.di+=1;bonus+=`<span>${art('diamond',20)}+1 за повторение</span>`}if(pass){S.lastReview=todayStr();S.reviews=(S.reviews||0)+1}}
+  else if(pass&&S.level<MAXL){S.level++;up=true;S.di+=1;bonus+=`<span>${art('diamond',20)}+1 за уровень</span>`;if(S.level===MAXL){S.master=todayStr();S.di+=5;S.lastReview=todayStr();bonus+=`<span>${art('diamond',20)}+5 за звание Мастер</span>`}}
+  if(clean&&!rev){S.clean++;S.di+=1;S.em+=5;bonus+=`<span>${art('diamond',20)}+1</span><span>${art('emerald',20)}+5 за чистый поход</span>`;if(tool('crown')){S.di+=1;bonus+=`<span>${art('crown',20)}+1 алмаз</span>`}}
+  S.lastHike={ok,pass,n,rev,d:todayStr()};const gain=h.gain;S.hike=null;questAdd('hike',1);save();checkAch();
+  const loot=`<span>${art('emerald',20)}+${gain.em}</span>`+Object.entries(gain.res).map(([k,n])=>`<span>${art(k,20)}+${n}</span>`).join('')+bonus;
+  const weakList=h.tasks.filter(t=>t.r!==true).map(t=>TYPES.find(x=>x.id===t.id).name);
+  $('#p-sum').innerHTML=`<h3>${rev?(pass?'Повторение пройдено!':'Повторение завершено'):pass?'Поход пройден!':'Поход завершён'}</h3><div class="sumbig">${ok}/${n}</div>
+    <div class="cells" style="width:100%;grid-template-columns:repeat(${n},1fr)">${h.tasks.map(t=>`<span class="cell ${t.r===true?'ok':'bad'}"></span>`).join('')}</div>
+    <p>${rev?(pass?'Тема не забыта! Следующее повторение — через 3 дня.':`Нужно ${need} верных из ${n}. Повтори правила и попробуй ещё раз.`):pass?(clean?'Ни одной ошибки — это чистый поход!':up?'Отличная работа! Открыт новый уровень.':'Отличная работа!'):`Нужно ${need} верных, а у тебя ${ok}. Следующий поход сделает упор на темы, где были ошибки.`}</p>
+    <b>Добыча за поход</b><div class="loot">${loot}</div>
+    ${weakList.length?`<p class="muted">Потренируй: ${[...new Set(weakList)].join(', ')}.</p>`:''}
+    <button class="btn go big" id="sum-again" type="button">${isMaster()?'Ещё повторение':'Новый поход'}</button><button class="btn wide" id="sum-home" type="button">На главную</button>`;
+  C=null;renderPlay();$('#p-sum').hidden=false;$('#p-start').hidden=true;$('#p-task').hidden=true;scrollTo(0,0);
+  $('#sum-again').onclick=()=>{$('#p-sum').hidden=true;startHike()};$('#sum-home').onclick=()=>{$('#p-sum').hidden=true;go('home')};
+  if(up)setTimeout(()=>S.level===MAXL?masterCert(true):levelUp(oldL+1),500);else if(ok>=6)sfx('coin')}
+function levelUp(L){sfx('lvl');rain(['#1fae4f','#35d0e0','#f6d046','#ffffff','#e0302a'],110);
+  const nr=RECIPES.filter(r=>r.lvl===L);
+  const rk=rank(L),newRank=rank(L-1).t!==rk.t;
+  showOv(`<div class="bigicon">${art('star',96)}</div><h2>Уровень ${L}!</h2>${newRank?`<p style="font-size:1.25rem">Новое звание: <b style="color:#245a18">${rk.t}</b></p>`:''}<p>Награда: <b>+1 алмаз</b></p>
+   ${nr.length?`<b>Новые рецепты на верстаке:</b><div class="loot">${nr.map(r=>`<span>${art(r.tool?r.id:Object.keys(r.out)[0],20)}${r.name}</span>`).join('')}</div>`:'<p class="muted">Задачи станут немного сложнее. Ты справишься!</p>'}
+   <button class="btn go big" type="button" data-close>Ура!</button>`)}
+
+function masterCert(fresh){if(fresh){sfx('lvl');rain(['#1fae4f','#35d0e0','#f6d046','#ffffff','#e0302a'],160);setTimeout(()=>rain(['#f6d046','#ffffff'],80),900)}
+  const d=(S.master||todayStr()).split('-').reverse().join('.');
+  showOv(`<div class="cert"><div class="bigicon">${art('cup',56)}</div><div class="cert-t">ГРАМОТА</div>
+   <p>награждается строитель,<br>освоивший тему</p><p class="cert-th">«Квадрат и прямоугольник»</p>
+   <p>Присвоено звание <b>Мастер</b></p>
+   <div class="loot"><span>Походов: ${S.hikes}</span><span>Верных: ${S.right}</span><span>Серия: ${S.best}</span></div>
+   <p class="muted">${d}</p></div>
+   ${fresh?'<p>Награда: <b>+5 алмазов</b>. Теперь раз в 3 дня проходи короткое повторение из 5 задач — так тема не забудется.</p>':''}
+   <button class="btn go big" type="button" data-close>${fresh?'Я — Мастер!':'Закрыть'}</button>`)}
+
+/* ---------- отрисовка ---------- */
+function renderWallets(){document.querySelectorAll('.wallet').forEach(w=>{w.innerHTML=`<span class="coin em">${art('emerald',18)}<b>${S.em}</b></span><span class="coin di">${art('diamond',18)}<b>${S.di}</b></span>`})}
+function renderHome(){ensureDaily();const rk=rank(S.level),nr=nextRank(S.level);
+  $('#hm-lvl').textContent=S.level;$('#hm-lvl').style.color=rk.c;$('#hm-lvl').style.borderColor=rk.c;$('#hm-lvl2').textContent=S.level;$('#hm-rank').textContent=rk.t;
+  $('#hm-goal').textContent=isMaster()?(reviewDue()?'Пора повторить тему: короткий поход из 5 задач.':`Тема освоена! Следующее повторение через ${3-daysSince(S.lastReview)} ${plural(3-daysSince(S.lastReview),'день','дня','дней')}.`)
+    :`Реши в походе 8 из 10 — откроется уровень ${S.level+1}`;
+  $('#hm-path').innerHTML=RANKS.map(r=>`<span class="rk ${S.level>=r.l?'on':''}" style="--rc:${r.c}" title="с ${r.l} уровня">${r.t}</span>`).join('');
+  $('#hm-next').textContent=nr?`До звания «${nr.t}»: ${nr.l-S.level} ${plural(nr.l-S.level,'уровень','уровня','уровней')}`:'Высшее звание получено!';
+  $('#hm-last').textContent=S.lastHike?`${S.lastHike.rev?'Прошлое повторение':'Прошлый поход'}: ${S.lastHike.ok} из ${S.lastHike.n||10}${S.lastHike.pass?' — пройден':''}.`:'Ты ещё не был в походе. Самое время начать!';
+  $('#hm-go').textContent=S.hike?`Продолжить ${hKind(S.hike)==='review'?'повторение':'поход'} (${S.hike.i+1}/${hN(S.hike)})`:isMaster()?'Повторение (5 задач)':'В поход!';
+  $('#hm-cert').hidden=!isMaster();
+  $('#quests').innerHTML=S.daily.q.map(q=>`<div class="quest ${q.p>=q.n?'done':''}"><span class="qt">${q.p>=q.n?'✓ ':''}${q.t}</span><span class="qn">${q.p}/${q.n}</span><div class="qbar"><i style="width:${q.p/q.n*100}%"></i></div></div>`).join('');
+  const all=S.daily.q.every(q=>q.p>=q.n);$('#q-claim').hidden=!(all&&!S.daily.claimed);
+  $('#q-note').textContent=S.daily.claimed?'Сундук на сегодня открыт. Завтра будут новые задания!':all?'':'Выполни все три задания — откроешь сундук с алмазом.';
+  const n=dayStreak();$('#days-n').textContent=n;const wd=['Вс','Пн','Вт','Ср','Чт','Пт','Сб'];let h='';
+  for(let i=6;i>=0;i--){const d=new Date();d.setDate(d.getDate()-i);const s=todayStr(d);h+=`<div class="day ${S.days.includes(s)?'on':''} ${i===0?'today':''}"><b>${S.days.includes(s)?'✓':d.getDate()}</b>${wd[d.getDay()]}</div>`}
+  $('#week').innerHTML=h;const nx=[3,7,14,30].find(x=>x>n);$('#days-next').textContent=nx?`До награды за ${nx} ${plural(nx,'день','дня','дней')} подряд: ${nx-n}. Реши хотя бы одну задачу в походе каждый день.`:'Ты настоящий чемпион упорства!';
+  $('#hm-inv').innerHTML=RES.map(r=>slot(r.id,have(r.id),r.name)).join('')}
+function slot(id,n,name){return `<div class="slotc ${n?'':'zero'}" title="${name}">${art(id,40)}${n?`<span class="n">${n}</span>`:''}<span class="nm">${name}</span></div>`}
+function renderPlay(){const m=mode();$('#p-title').textContent=m==='free'?'Тренировка':'Поход';
+  if(!$('#p-sum').hidden&&!m){return}
+  $('#p-start').hidden=!!m;$('#p-task').hidden=!m;
+  if(!m){$('#fr-type').value=S.free||'all';$('#p-intro').innerHTML=isMaster()?'<h3>Повторение: 5 задач</h3><p>Ты уже <b>Мастер</b>! Повторение помогает не забыть тему. Реши <b>4 из 5</b>. Раз в 3 дня за повторение даётся алмаз.</p>':'<h3>Поход: 10 задач</h3><p>В походе задачи всех видов: прямоугольник, квадрат, сложные фигуры и единицы. Реши верно <b>8 из 10</b>, и откроется <b>новый уровень</b> с новыми рецептами.</p>';$('#p-go').textContent=isMaster()?'Начать повторение':'Начать поход';return}
+  if(m==='hike'){const h=S.hike;$('#p-head').innerHTML=`<div class="cells" style="grid-template-columns:repeat(${hN(h)},1fr)">${h.tasks.map((t,i)=>`<span class="cell ${t.r===true?'ok':t.r===false?'bad':''} ${i===h.i?'now':''}"></span>`).join('')}</div><span class="muted">${hKind(h)==='review'?'Повторение · ':''}Задача ${h.i+1} из ${hN(h)} · верно ${h.tasks.filter(t=>t.r===true).length} · нужно ${hNeed(h)}</span>`;
+    $('#t-leave').textContent='На главную (поход сохранится)'}
+  else{$('#p-head').innerHTML=`<div class="freebar"><b>Свободная тренировка — без наград</b><select id="fr-type2" aria-label="Вид задач"></select></div>`;
+    $('#fr-type2').innerHTML=$('#fr-type').innerHTML;$('#fr-type2').value=S.free||'all';$('#fr-type2').onchange=e=>startFree(e.target.value);
+    $('#t-leave').textContent='Закончить тренировку'}}
+let seg='rcp';
+function renderCraft(){document.querySelectorAll('[data-seg]').forEach(b=>b.classList.toggle('on',b.dataset.seg===seg));
+  $('#c-rcp').hidden=seg!=='rcp';$('#c-shop').hidden=seg!=='shop';$('#c-inv').hidden=seg!=='inv';
+  $('#c-rcp').innerHTML=RECIPES.map(r=>{const locked=S.level<r.lvl,own=r.tool&&tool(r.id),can=canCraft(r),ic=r.tool?r.id:Object.keys(r.out)[0];
+    return `<div class="rcp ${locked?'locked':''} ${own?'own':''}" data-craft="${r.id}"><div class="pic">${art(ic,40)}</div><div><div class="nm">${r.name}</div><div class="eff">${r.eff}</div>
+     <div class="need">${Object.entries(r.need).map(([k,n])=>`<span class="${have(k)<n&&!own?'lack':''}">${art(k,16)}${have(k)}/${n}</span>`).join('')}</div></div>
+     <div class="act">${own?'<span class="goal" style="color:var(--ok)">✓ Есть</span>':locked?`<span class="muted">Откроется на уровне ${r.lvl}</span>`:`<button class="btn go" type="button" data-do="${r.id}" ${can?'':'disabled'}>Скрафтить</button>`}</div></div>`}).join('');
+  const SHOP=[['wood',1],['stone',1],['coal',2],['iron',3],['gold',5]];
+  $('#shop').innerHTML=SHOP.map(([k,p])=>`<div class="shopi">${art(k,36)}<b>${resName(k)}</b><span class="muted">есть: ${have(k)}</span><button class="btn" type="button" data-buyres="${k}" data-p="${p}" ${S.em<p?'disabled':''}>Купить за ${em(16)}${p}</button></div>`).join('')+
+    `<div class="shopi">${art('diamond',36)}<b>Алмаз</b><span class="muted">есть: ${S.di}</span><button class="btn" type="button" data-trade ${S.em<8?'disabled':''}>Обмен ${em(16)}8</button></div>`;
+  $('#inv-res').innerHTML=RES.map(r=>slot(r.id,have(r.id),r.name)).join('');
+  const owned=RECIPES.filter(r=>r.tool&&tool(r.id)),extra=['apple','potion'].filter(k=>tool(k));
+  $('#inv-tools').innerHTML=owned.map(r=>slot(r.id,1,r.name)).join('')+extra.map(k=>slot(k,1,ITEMS.find(i=>i.id===k).name)).join('')||'<p class="muted">Пока пусто. Загляни в рецепты!</p>';
+  $('#inv-eff').textContent=owned.length?'Действуют: '+owned.map(r=>r.name+' — '+r.eff.toLowerCase()).join(' '):''}
+$('#c-rcp').addEventListener('click',e=>{const b=e.target.closest('[data-do]');if(b)doCraft(b.dataset.do)});
+$('#shop').addEventListener('click',e=>{const b=e.target.closest('[data-buyres]');if(b){const p=+b.dataset.p;if(S.em<p)return;S.em-=p;addRes(b.dataset.buyres,1);sfx('coin');save();render();return}
+  if(e.target.closest('[data-trade]')){if(S.em<8)return;S.em-=8;S.di++;sfx('coin');save();render()}});
+document.querySelectorAll('[data-seg]').forEach(b=>b.addEventListener('click',()=>{seg=b.dataset.seg;renderCraft()}));
+function renderStats(){$('#st-level').textContent=S.level;$('#st-hikes').textContent=S.hikes;$('#st-right').textContent=S.right;$('#st-best').textContent=S.best;$('#st-clean').textContent=S.clean;
+  $('#st-types').textContent=`${TYPES.filter(t=>S.solved[t.id]).length}/${TYPES.length}`;
+  $('#achs').innerHTML=ACH.map(a=>`<div class="ach ${S.ach[a.id]?'':'locked'}">${art(a.ic,34)}<div><b>${a.t}</b><span>${a.s}</span></div></div>`).join('');$('#snd').checked=!!S.sound}
+$('#snd').addEventListener('change',e=>{S.sound=e.target.checked;save();if(S.sound)sfx('coin')});
+function render(){renderWallets();if(tab==='home')renderHome();if(tab==='play')renderPlay();if(tab==='craft')renderCraft();if(tab==='theory')renderTheoryGrid();if(tab==='stats')renderStats();
+  const ready=S.daily&&S.daily.q.every(q=>q.p>=q.n)&&!S.daily.claimed,hb=document.querySelector('[data-tab="home"]');let dot=hb.querySelector('.dot');if(ready&&!dot){dot=document.createElement('span');dot.className='dot';hb.appendChild(dot)}if(!ready&&dot)dot.remove()}
+document.querySelectorAll('[data-done]').forEach(e=>e.remove());
+
+/* ---------- кнопки ---------- */
+$('#hm-go').addEventListener('click',()=>{go('play');if(S.hike)openTask();else startHike()});
+$('#hm-free').addEventListener('click',()=>{go('play');$('#p-sum').hidden=true;if(!mode())renderPlay()});
+$('#hm-craft').addEventListener('click',()=>{seg='rcp';go('craft')});
+$('#q-claim').addEventListener('click',claimDaily);
+$('#hm-cert').addEventListener('click',()=>masterCert(false));
+$('#p-go').addEventListener('click',()=>{$('#p-sum').hidden=true;startHike()});
+$('#fr-type').innerHTML='<option value="all">Все виды вперемешку</option>'+GROUPS.map(g=>`<optgroup label="${g.name}">${TYPES.filter(t=>t.g===g.id).map(t=>`<option value="${t.id}">${t.name}</option>`).join('')}</optgroup>`).join('');
+$('#fr-go').addEventListener('click',()=>{$('#p-sum').hidden=true;startFree($('#fr-type').value)});
+document.addEventListener('click',e=>{const b=e.target.closest('[data-train]');if(!b)return;if(S.hike){toast('<span>Сначала закончи поход — он сохранён.</span>');return}closeSheet();closeTheory();go('play');$('#p-sum').hidden=true;startFree(b.dataset.train)});
 $('#reset-box').addEventListener('click',e=>{const box=$('#reset-box');
-  if(e.target.id==='reset')box.innerHTML='<span><b>Точно стереть весь прогресс и предметы?</b></span><button class="btn small" id="reset-yes" type="button">Да, стереть</button><button class="btn small go" id="reset-no" type="button">Нет</button>';
-  if(e.target.id==='reset-yes'){S={em:3,di:0,xp:0,streak:0,best:0,right:0,total:0,solved:{},items:[]};save();newTask();toast('<span>Прогресс обнулён. <span class="y">Начинаем с нуля!</span></span>')}
-  if(e.target.id==='reset-yes'||e.target.id==='reset-no')box.innerHTML='<button class="btn small" id="reset" type="button">Начать заново</button>'});
-newTask(S.cur);
+  if(e.target.id==='reset')box.innerHTML='<span><b>Точно стереть весь прогресс, ресурсы и вещи?</b></span><button class="btn small" id="reset-yes" type="button">Да, стереть</button><button class="btn small go" id="reset-no" type="button">Нет</button>';
+  if(e.target.id==='reset-yes'){S=DEF();save();C=null;toast('<span>Прогресс обнулён. <span class="y">Начинаем с нуля!</span></span>')}
+  if(e.target.id==='reset-yes'||e.target.id==='reset-no'){box.innerHTML='<button class="btn small" id="reset" type="button">Начать заново</button>';render()}});
+
+/* ---------- старт ---------- */
+ensureDaily();save();
+if(mode())openTask();
+render();
 
 /* ---------- пиксельный фон ---------- */
 function drawBg(){const cv=$('#bg'),P=8,w=Math.ceil(innerWidth/P),h=Math.ceil(innerHeight/P);cv.width=w;cv.height=h;const g=cv.getContext('2d'),r=mulberry32(99);
